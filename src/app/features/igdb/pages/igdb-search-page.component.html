@@ -1,0 +1,35 @@
+<main class="page">
+  <header class="header">
+    <p class="eyebrow">GameNote · IGDB</p>
+    <h1>Importer les informations d’un jeu</h1>
+    <p>Recherche un titre pour récupérer sa couverture et ses informations principales.</p>
+    <form class="search" (submit)="$event.preventDefault(); search()">
+      <label class="sr-only" for="game-search">Titre du jeu</label>
+      <input id="game-search" [formControl]="query" placeholder="Street Fighter 6, Tekken 8…" autocomplete="off">
+      <button type="submit">Rechercher</button>
+    </form>
+  </header>
+
+  @if (loading()) { <p class="state">Recherche en cours…</p> }
+  @if (error()) { <p class="state error">{{ error() }}</p> }
+  @if (!loading() && !error() && query.value.length >= 2 && results().length === 0) { <p class="state">Aucun jeu trouvé.</p> }
+
+  <section class="grid" aria-label="Résultats IGDB">
+    @for (game of results(); track game.igdbId) {
+      <article class="card">
+        @if (game.coverUrl) { <img [src]="game.coverUrl" [alt]="'Couverture de ' + game.title" loading="lazy"> } @else { <div class="placeholder">Pas d’image</div> }
+        <div class="content">
+          <h2>{{ game.title }}</h2>
+          @if (game.firstReleaseDate) { <p class="muted">Sortie : {{ game.firstReleaseDate * 1000 | date:'yyyy' }}</p> }
+          <p class="summary">{{ game.summary || 'Aucune description disponible.' }}</p>
+          @if (game.developers.length) { <p><strong>Développeur :</strong> {{ game.developers.join(', ') }}</p> }
+          @if (game.publishers.length) { <p><strong>Éditeur :</strong> {{ game.publishers.join(', ') }}</p> }
+          @if (game.platforms.length) { <p><strong>Plateformes :</strong> {{ game.platforms.join(', ') }}</p> }
+          @if (game.genres.length) { <div class="tags">@for (genre of game.genres; track genre) { <span>{{ genre }}</span> }</div> }
+          <p class="rating">IGDB : {{ game.aggregatedRating ?? game.rating ?? '—' }} / 100</p>
+        </div>
+      </article>
+    }
+  </section>
+  <footer>Metadata and images provided by IGDB.</footer>
+</main>
