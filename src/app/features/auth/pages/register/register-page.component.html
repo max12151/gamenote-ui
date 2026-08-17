@@ -1,0 +1,66 @@
+<div class="auth-page">
+  <form
+    class="card"
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+  >
+    <p class="eyebrow">GameNote</p>
+    <h1>Créer un compte</h1>
+
+    <label for="username">Nom d'utilisateur</label>
+    <input
+      id="username"
+      formControlName="username"
+      autocomplete="username"
+    />
+
+    <label for="email">Email</label>
+    <input
+      id="email"
+      type="email"
+      formControlName="email"
+      autocomplete="email"
+    />
+
+    <label for="password">Mot de passe</label>
+    <input
+      id="password"
+      type="password"
+      formControlName="password"
+      autocomplete="new-password"
+    />
+
+    <label for="bio">Bio (optionnel)</label>
+    <textarea
+      id="bio"
+      formControlName="bio"
+      rows="3"
+    ></textarea>
+
+    <label for="avatarUrl">URL d'avatar (optionnel)</label>
+    <input
+      id="avatarUrl"
+      formControlName="avatarUrl"
+      placeholder="https://…"
+      autocomplete="off"
+    />
+
+    @if (error()) {
+      <p class="state error">
+        {{ error() }}
+      </p>
+    }
+
+    <button
+      type="submit"
+      [disabled]="loading()"
+    >
+      {{ loading() ? 'Création…' : 'Créer mon compte' }}
+    </button>
+
+    <p class="switch">
+      Déjà un compte ?
+      <a routerLink="/login">Se connecter</a>
+    </p>
+  </form>
+</div>
