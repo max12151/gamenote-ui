@@ -1,0 +1,76 @@
+:host {
+  display: block;
+}
+
+.note-picker {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.bar {
+  display: flex;
+  gap: 1px;
+  flex: 1;
+  min-width: 0;
+}
+
+.segment {
+  flex: 1;
+  height: 1.6rem;
+  min-width: 0;
+  border: none;
+  border-radius: 0.2rem;
+  background: #e2e8f0;
+  color: #94a3b8;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0;
+  transition: background 0.15s, color 0.15s, transform 0.1s;
+
+  &:first-child {
+    border-top-left-radius: 0.4rem;
+    border-bottom-left-radius: 0.4rem;
+  }
+
+  &:last-child {
+    border-top-right-radius: 0.4rem;
+    border-bottom-right-radius: 0.4rem;
+  }
+
+  &.filled {
+    color: rgb(255 255 255 / 90%);
+    text-shadow: 0 1px 1px rgb(0 0 0 / 35%);
+  }
+
+  &:hover:not(:disabled) {
+    transform: scaleY(1.15);
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.current {
+  flex-shrink: 0;
+  font-weight: 800;
+  font-size: 0.95rem;
+}
+
+.compact {
+  .segment {
+    height: 0.55rem;
+    border-radius: 0.1rem;
+
+    &:hover:not(:disabled) {
+      transform: none;
+    }
+  }
+
+  .current {
+    font-size: 0.8rem;
+  }
+}

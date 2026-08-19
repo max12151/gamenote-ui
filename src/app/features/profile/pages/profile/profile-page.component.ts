@@ -1,15 +1,17 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../../../core/auth/auth.service';
+import { RatingStats } from '../../../../core/models/rating-stats.model';
+import { RatingService } from '../../../../core/rating/rating.service';
 import { ProfileService } from '../../data-access/profile.service';
 
 @Component({
   selector: 'app-profile-page',
-  imports: [ReactiveFormsModule, DatePipe],
+  imports: [ReactiveFormsModule, DatePipe, DecimalPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './profile-page.component.html',
   styleUrl: './profile-page.component.scss'
@@ -17,6 +19,7 @@ import { ProfileService } from '../../data-access/profile.service';
 export class ProfilePageComponent {
   private readonly fb = inject(FormBuilder);
   private readonly profileService = inject(ProfileService);
+  private readonly ratingService = inject(RatingService);
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
 
@@ -26,6 +29,9 @@ export class ProfilePageComponent {
   readonly editing = signal(false);
   readonly error = signal('');
   readonly success = signal('');
+
+  readonly stats = signal<RatingStats | null>(null);
+  readonly statsLoading = signal(true);
 
   readonly form = this.fb.nonNullable.group({
     bio: ['', [Validators.maxLength(1000)]],
@@ -38,6 +44,13 @@ export class ProfilePageComponent {
     ).subscribe({
       next: user => this.resetFormFrom(user),
       error: () => this.error.set("Impossible de charger le profil.")
+    });
+
+    this.ratingService.getStats().pipe(
+      finalize(() => this.statsLoading.set(false))
+    ).subscribe({
+      next: stats => this.stats.set(stats),
+      error: () => {}
     });
   }
 

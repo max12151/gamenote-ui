@@ -1,0 +1,34 @@
+<div
+  class="note-picker"
+  [class.compact]="size() === 'compact'"
+  [class.disabled]="disabled()"
+  (mouseleave)="onHover(null)"
+>
+  <div class="bar">
+    @for (note of notes; track note) {
+      <button
+        type="button"
+        class="segment"
+        [class.filled]="isFilled(note)"
+        [style.background]="isFilled(note) ? colorFor(note) : null"
+        [disabled]="disabled()"
+        [attr.aria-label]="'Noter ' + note + ' sur 10'"
+        (click)="pick(note)"
+        (mouseenter)="onHover(note)"
+      >
+        @if (size() !== 'compact') {
+          {{ note }}
+        }
+      </button>
+    }
+  </div>
+
+  @if (showCurrentValue() && value(); as current) {
+    <span
+      class="current"
+      [style.color]="colorFor(current)"
+    >
+      {{ current }}/10
+    </span>
+  }
+</div>

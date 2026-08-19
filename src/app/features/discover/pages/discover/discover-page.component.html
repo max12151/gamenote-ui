@@ -1,0 +1,102 @@
+<div class="page">
+  <header class="header">
+    <p class="eyebrow">GameNote · Découvrir</p>
+    <h1>Découvrir de nouveaux jeux</h1>
+    <p>Des jeux triés par popularité, un par un. Note-les ou passe au suivant.</p>
+
+    <label
+      class="sr-only"
+      for="genre-select"
+    >
+      Genre
+    </label>
+    <select
+      id="genre-select"
+      class="genre-select"
+      [value]="selectedGenre()"
+      (change)="onGenreChange($any($event.target).value)"
+    >
+      <option value="">Tous les genres</option>
+      @for (genre of genres; track genre) {
+        <option [value]="genre">{{ genre }}</option>
+      }
+    </select>
+  </header>
+
+  @if (error()) {
+    <p class="state error">
+      {{ error() }}
+    </p>
+  }
+
+  @if (loading() && !current()) {
+    <p class="state">
+      Recherche de jeux populaires…
+    </p>
+  } @else if (!current() && exhausted()) {
+    <p class="state">
+      Tu as fait le tour ! Plus aucun jeu à te proposer pour ce filtre.
+    </p>
+  } @else if (current(); as game) {
+    <article class="spotlight">
+      @if (game.coverUrl) {
+        <img
+          class="cover"
+          [src]="game.coverUrl"
+          [alt]="'Couverture de ' + game.title"
+        />
+      } @else {
+        <div class="cover placeholder">
+          <ng-icon
+            name="phosphorImageDuotone"
+            size="3rem"
+          />
+          <span>Pas de couverture</span>
+        </div>
+      }
+
+      <div class="info">
+        <h2>{{ game.title }}</h2>
+
+        @if (game.firstReleaseDate) {
+          <p class="muted">
+            Sortie : {{ game.firstReleaseDate * 1000 | date: 'longDate' }}
+          </p>
+        }
+
+        <p class="summary">
+          {{ game.summary || 'Aucune description disponible.' }}
+        </p>
+
+        @if (game.genres.length) {
+          <div class="tags">
+            @for (genre of game.genres; track genre) {
+              <span>{{ genre }}</span>
+            }
+          </div>
+        }
+
+        <div class="note-section">
+          <p class="note-label">Ta note</p>
+          <app-note-picker
+            [disabled]="saving()"
+            (valueChange)="rate($event)"
+          />
+
+          @if (justRated(); as note) {
+            <p class="confirmation">Noté {{ note }}/10 !</p>
+          }
+        </div>
+
+        <button
+          type="button"
+          class="skip"
+          [disabled]="saving()"
+          (click)="skip()"
+        >
+          Passer ce jeu
+        </button>
+      </div>
+    </article>
+  }
+</div>

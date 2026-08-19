@@ -1,13 +1,36 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NgIcon, provideIcons } from '@ng-icons/core';
+import {
+  phosphorCompassDuotone,
+  phosphorGameControllerDuotone,
+  phosphorMagnifyingGlassDuotone,
+  phosphorSignInDuotone,
+  phosphorSignOutDuotone,
+  phosphorStackDuotone,
+  phosphorUserCircleDuotone,
+  phosphorUserPlusDuotone
+} from '@ng-icons/phosphor-icons/duotone';
 import { AuthService } from './core/auth/auth.service';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, RouterLink],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NgIcon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
+  providers: [
+    provideIcons({
+      phosphorCompassDuotone,
+      phosphorGameControllerDuotone,
+      phosphorMagnifyingGlassDuotone,
+      phosphorStackDuotone,
+      phosphorUserCircleDuotone,
+      phosphorSignInDuotone,
+      phosphorSignOutDuotone,
+      phosphorUserPlusDuotone
+    })
+  ]
 })
 export class App {
   protected readonly auth = inject(AuthService);

@@ -95,6 +95,107 @@
   }
 }
 
+.stats {
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid #e2e8f0;
+
+  h2 {
+    margin: 0 0 1rem;
+    color: #172033;
+    font-size: 1.05rem;
+  }
+}
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.stat-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.9rem;
+  border-radius: 0.6rem;
+  background: #f5f3ff;
+}
+
+.stat-value {
+  color: #5b21b6;
+  font-weight: 700;
+  font-size: 1.15rem;
+  overflow-wrap: break-word;
+}
+
+.stat-label {
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.best-game {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+
+  img {
+    width: 48px;
+    height: 64px;
+    border-radius: 0.4rem;
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+}
+
+.best-title {
+  margin: 0.1rem 0 0;
+  color: #172033;
+  font-weight: 600;
+}
+
+.genre-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.genre-row {
+  display: grid;
+  grid-template-columns: 9rem 1fr 1.5rem;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.genre-name {
+  overflow: hidden;
+  color: #475569;
+  font-size: 0.85rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.genre-bar {
+  height: 0.5rem;
+  border-radius: 99px;
+  background: #ede9fe;
+  overflow: hidden;
+}
+
+.genre-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: #6d28d9;
+}
+
+.genre-count {
+  color: #64748b;
+  font-size: 0.8rem;
+  text-align: right;
+}
+
 .edit-form {
   display: flex;
   flex-direction: column;

@@ -1,0 +1,218 @@
+<div class="page">
+  <header class="header">
+    <p class="eyebrow">GameNote · Collection</p>
+    <h1>Mes jeux notés</h1>
+    <p>Retrouve ici tous les jeux que tu as notés.</p>
+  </header>
+
+  @if (loading()) {
+    <p class="state">
+      Chargement de ta collection…
+    </p>
+  }
+
+  @if (error()) {
+    <p class="state error">
+      {{ error() }}
+    </p>
+  }
+
+  @if (!loading() && !error() && ratings().length === 0) {
+    <p class="state">
+      Tu n'as encore noté aucun jeu.
+      <a routerLink="/igdb">Va en chercher un</a>
+      !
+    </p>
+  }
+
+  @if (ratings().length > 0) {
+    <div class="toolbar">
+      <label>
+        Trier par
+        <select
+          [value]="sortKey()"
+          (change)="setSortKey($any($event.target).value)"
+        >
+          <option value="added">Date d'ajout</option>
+          <option value="rating">Note</option>
+          <option value="releaseDate">Date de sortie</option>
+          <option value="title">Titre</option>
+        </select>
+      </label>
+
+      <button
+        type="button"
+        class="sort-dir"
+        [attr.aria-label]="sortDir() === 'asc' ? 'Ordre croissant' : 'Ordre décroissant'"
+        (click)="toggleSortDir()"
+      >
+        {{ sortDir() === 'asc' ? '↑' : '↓' }}
+      </button>
+
+      @if (availableGenres().length > 0) {
+        <label>
+          Genre
+          <select
+            [value]="genreFilter()"
+            (change)="setGenreFilter($any($event.target).value)"
+          >
+            <option value="">Tous</option>
+            @for (genre of availableGenres(); track genre) {
+              <option [value]="genre">{{ genre }}</option>
+            }
+          </select>
+        </label>
+      }
+
+      <span class="count">{{ displayedRatings().length }} jeu{{ displayedRatings().length > 1 ? 'x' : '' }}</span>
+    </div>
+  }
+
+  <section
+    class="grid"
+    aria-label="Jeux notés"
+  >
+    @for (item of displayedRatings(); track item.igdbGameId) {
+      <article class="card">
+        <div
+          class="cover-link"
+          role="button"
+          tabindex="0"
+          [attr.aria-label]="'Voir les détails de ' + item.title"
+          (click)="openModal(item)"
+          (keydown.enter)="openModal(item)"
+          (keydown.space)="openModal(item); $event.preventDefault()"
+        >
+          @if (item.coverUrl) {
+            <img
+              [src]="item.coverUrl"
+              [alt]="'Couverture de ' + item.title"
+              loading="lazy"
+            />
+          } @else {
+            <div class="placeholder">
+              <ng-icon
+                name="phosphorImageDuotone"
+                size="2.25rem"
+              />
+              <span>Pas de couverture</span>
+            </div>
+          }
+
+          <h2>{{ item.title }}</h2>
+        </div>
+
+        <div class="content">
+          <div class="meta-row">
+            <p class="muted small">
+              Noté le {{ item.updatedAt ?? item.createdAt | date: 'longDate' }}
+            </p>
+
+            <span
+              class="rating-badge"
+              [style.color]="ratingColor(item.rating)"
+            >
+              {{ item.rating }}/10
+            </span>
+          </div>
+
+          <app-note-picker
+            [value]="item.rating"
+            [showCurrentValue]="false"
+            (valueChange)="updateRating(item, $event)"
+          />
+
+          <button
+            type="button"
+            class="remove"
+            [disabled]="removingId() === item.igdbGameId"
+            (click)="remove(item)"
+          >
+            {{ removingId() === item.igdbGameId ? 'Retrait…' : 'Retirer de la collection' }}
+          </button>
+        </div>
+      </article>
+    }
+  </section>
+</div>
+
+@if (selectedRating(); as item) {
+  <div
+    class="modal-backdrop"
+    (click)="closeModal()"
+  >
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="item.title"
+      (click)="$event.stopPropagation()"
+    >
+      <button
+        type="button"
+        class="modal-close"
+        aria-label="Fermer"
+        (click)="closeModal()"
+      >
+        ×
+      </button>
+
+      <div class="modal-body">
+        @if (item.coverUrl) {
+          <img
+            class="modal-cover"
+            [src]="item.coverUrl"
+            [alt]="'Couverture de ' + item.title"
+          />
+        } @else {
+          <div class="modal-cover placeholder">
+            <ng-icon
+              name="phosphorImageDuotone"
+              size="3rem"
+            />
+            <span>Pas de couverture</span>
+          </div>
+        }
+
+        <div class="modal-info">
+          <h2>{{ item.title }}</h2>
+
+          @if (item.releaseDate) {
+            <p class="muted">
+              Sortie : {{ item.releaseDate * 1000 | date: 'longDate' }}
+            </p>
+          }
+
+          <p class="muted small">
+            Noté le {{ item.updatedAt ?? item.createdAt | date: 'longDate' }}
+          </p>
+
+          @if (item.genres.length) {
+            <div class="tags">
+              @for (genre of item.genres; track genre) {
+                <span>{{ genre }}</span>
+              }
+            </div>
+          }
+
+          <div class="note-section">
+            <p class="note-label">Ta note</p>
+            <app-note-picker
+              [value]="item.rating"
+              (valueChange)="updateRating(item, $event)"
+            />
+          </div>
+
+          <button
+            type="button"
+            class="remove"
+            [disabled]="removingId() === item.igdbGameId"
+            (click)="remove(item)"
+          >
+            {{ removingId() === item.igdbGameId ? 'Retrait…' : 'Retirer de la collection' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

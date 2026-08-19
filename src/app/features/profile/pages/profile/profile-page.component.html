@@ -44,6 +44,69 @@
         </p>
       }
 
+      <section class="stats">
+        <h2>Statistiques</h2>
+
+        @if (statsLoading()) {
+          <p class="muted">Chargement des statistiques…</p>
+        } @else if (stats(); as s) {
+          @if (s.totalRated === 0) {
+            <p class="muted">Tu n'as pas encore noté de jeu.</p>
+          } @else {
+            <div class="stat-grid">
+              <div class="stat-tile">
+                <span class="stat-value">{{ s.totalRated }}</span>
+                <span class="stat-label">Jeu{{ s.totalRated > 1 ? 'x' : '' }} noté{{ s.totalRated > 1 ? 's' : '' }}</span>
+              </div>
+
+              <div class="stat-tile">
+                <span class="stat-value">{{ s.averageRating | number: '1.1-1' }}/10</span>
+                <span class="stat-label">Note moyenne</span>
+              </div>
+
+              @if (s.topGenre) {
+                <div class="stat-tile">
+                  <span class="stat-value">{{ s.topGenre }}</span>
+                  <span class="stat-label">Genre préféré</span>
+                </div>
+              }
+            </div>
+
+            @if (s.bestRatedGame; as best) {
+              <div class="best-game">
+                @if (best.coverUrl) {
+                  <img
+                    [src]="best.coverUrl"
+                    [alt]="'Couverture de ' + best.title"
+                  />
+                }
+                <div>
+                  <p class="muted small">Meilleure note</p>
+                  <p class="best-title">{{ best.title }} — {{ best.rating }}/10</p>
+                </div>
+              </div>
+            }
+
+            @if (s.genreBreakdown.length) {
+              <div class="genre-breakdown">
+                @for (g of s.genreBreakdown; track g.genre) {
+                  <div class="genre-row">
+                    <span class="genre-name">{{ g.genre }}</span>
+                    <div class="genre-bar">
+                      <div
+                        class="genre-bar-fill"
+                        [style.width.%]="(g.count / s.genreBreakdown[0].count) * 100"
+                      ></div>
+                    </div>
+                    <span class="genre-count">{{ g.count }}</span>
+                  </div>
+                }
+              </div>
+            }
+          }
+        }
+      </section>
+
       @if (!editing()) {
         <section class="bio">
           <h2>Bio</h2>

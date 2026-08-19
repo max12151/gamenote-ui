@@ -11,5 +11,15 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./features/profile/pages/profile/profile-page.component').then(m => m.ProfilePageComponent)
   },
+  {
+    path: 'collection',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/collection/pages/collection/collection-page.component').then(m => m.CollectionPageComponent)
+  },
+  {
+    path: 'decouvrir',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/discover/pages/discover/discover-page.component').then(m => m.DiscoverPageComponent)
+  },
   { path: '**', redirectTo: 'igdb' },
 ];

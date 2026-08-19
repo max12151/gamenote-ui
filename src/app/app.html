@@ -3,23 +3,71 @@
     routerLink="/igdb"
     class="brand"
   >
-    GameNote
+    <ng-icon
+      name="phosphorGameControllerDuotone"
+      size="1.6rem"
+    />
+    <span>GameNote</span>
   </a>
 
   <div class="links">
-    <a routerLink="/igdb">Recherche</a>
+    <a
+      routerLink="/igdb"
+      routerLinkActive="active"
+    >
+      <ng-icon name="phosphorMagnifyingGlassDuotone" />
+      <span>Recherche</span>
+    </a>
 
     @if (auth.isAuthenticated()) {
-      <a routerLink="/profil">Profil</a>
+      <a
+        routerLink="/decouvrir"
+        routerLinkActive="active"
+      >
+        <ng-icon name="phosphorCompassDuotone" />
+        <span>Découvrir</span>
+      </a>
+
+      <a
+        routerLink="/collection"
+        routerLinkActive="active"
+      >
+        <ng-icon name="phosphorStackDuotone" />
+        <span>Collection</span>
+      </a>
+
+      <a
+        routerLink="/profil"
+        routerLinkActive="active"
+      >
+        <ng-icon name="phosphorUserCircleDuotone" />
+        <span>Profil</span>
+      </a>
+    }
+  </div>
+
+  <div class="actions">
+    @if (auth.isAuthenticated()) {
       <button
         type="button"
         (click)="logout()"
       >
-        Déconnexion
+        <ng-icon name="phosphorSignOutDuotone" />
+        <span>Déconnexion</span>
       </button>
     } @else {
-      <a routerLink="/login">Connexion</a>
-      <a routerLink="/register">Inscription</a>
+      <a routerLink="/login">
+        <ng-icon name="phosphorSignInDuotone" />
+        <span>Connexion</span>
+      </a>
+
+      <a
+        routerLink="/register"
+        class="cta"
+      >
+        <ng-icon name="phosphorUserPlusDuotone" />
+        <span>Inscription</span>
+      </a>
     }
   </div>
 </nav>

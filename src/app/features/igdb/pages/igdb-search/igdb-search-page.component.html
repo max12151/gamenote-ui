@@ -3,7 +3,7 @@
     <header class="header">
       <p class="eyebrow">GameNote · IGDB</p>
 
-      <h1>Importer les informations d’un jeu</h1>
+      <h1>Chercher les informations d’un jeu</h1>
 
       <p>
         Recherche un titre pour récupérer sa couverture et ses informations
@@ -62,7 +62,15 @@
       aria-label="Résultats IGDB"
     >
       @for (game of results(); track game.igdbId) {
-        <article class="card">
+        <article
+          class="card"
+          role="button"
+          tabindex="0"
+          [attr.aria-label]="'Voir les détails de ' + game.title"
+          (click)="openModal(game)"
+          (keydown.enter)="openModal(game)"
+          (keydown.space)="openModal(game); $event.preventDefault()"
+        >
           @if (game.coverUrl) {
             <img
               [src]="game.coverUrl"
@@ -71,7 +79,11 @@
             />
           } @else {
             <div class="placeholder">
-              Pas d’image
+              <ng-icon
+                name="phosphorImageDuotone"
+                size="2.25rem"
+              />
+              <span>Pas de couverture</span>
             </div>
           }
 
@@ -80,53 +92,22 @@
               {{ game.title }}
             </h2>
 
-            @if (game.firstReleaseDate) {
-              <p class="muted">
-                Sortie :
-                {{ game.firstReleaseDate * 1000 | date: 'yyyy' }}
-              </p>
-            }
-
-            <p class="summary">
-              {{ game.summary || 'Aucune description disponible.' }}
-            </p>
-
-            @if (game.developers.length) {
-              <p>
-                <strong>Développeur :</strong>
-                {{ game.developers.join(', ') }}
-              </p>
-            }
-
-            @if (game.publishers.length) {
-              <p>
-                <strong>Éditeur :</strong>
-                {{ game.publishers.join(', ') }}
-              </p>
-            }
-
-            @if (game.platforms.length) {
-              <p>
-                <strong>Plateformes :</strong>
-                {{ game.platforms.join(', ') }}
-              </p>
-            }
-
-            @if (game.genres.length) {
-              <div class="tags">
-                @for (genre of game.genres; track genre) {
-                  <span>
-                    {{ genre }}
-                  </span>
-                }
-              </div>
-            }
-
             <p class="rating">
               IGDB :
-              {{ game.aggregatedRating ?? game.rating ?? '—' }}
+              {{ igdbRating(game) ?? '—' }}
               / 100
             </p>
+
+            @if (ratingFor(game); as note) {
+              <div class="personal-note">
+                <p class="note-label">Votre note</p>
+                <app-note-picker
+                  [value]="note"
+                  [disabled]="true"
+                  size="compact"
+                />
+              </div>
+            }
           </div>
         </article>
       }
@@ -137,3 +118,112 @@
     Metadata and images provided by IGDB.
   </footer>
 </div>
+
+@if (selectedGame(); as game) {
+  <div
+    class="modal-backdrop"
+    (click)="closeModal()"
+  >
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="game.title"
+      (click)="$event.stopPropagation()"
+    >
+      <button
+        type="button"
+        class="modal-close"
+        aria-label="Fermer"
+        (click)="closeModal()"
+      >
+        ×
+      </button>
+
+      <div class="modal-body">
+        @if (game.coverUrl) {
+          <img
+            class="modal-cover"
+            [src]="game.coverUrl"
+            [alt]="'Couverture de ' + game.title"
+          />
+        } @else {
+          <div class="modal-cover placeholder">
+            <ng-icon
+              name="phosphorImageDuotone"
+              size="3rem"
+            />
+            <span>Pas de couverture</span>
+          </div>
+        }
+
+        <div class="modal-info">
+          <h2>{{ game.title }}</h2>
+
+          @if (game.firstReleaseDate) {
+            <p class="muted">
+              Sortie :
+              {{ game.firstReleaseDate * 1000 | date: 'longDate' }}
+            </p>
+          }
+
+          <p class="summary">
+            {{ game.summary || 'Aucune description disponible.' }}
+          </p>
+
+          @if (game.developers.length) {
+            <p>
+              <strong>Développeur :</strong>
+              {{ game.developers.join(', ') }}
+            </p>
+          }
+
+          @if (game.publishers.length) {
+            <p>
+              <strong>Éditeur :</strong>
+              {{ game.publishers.join(', ') }}
+            </p>
+          }
+
+          @if (game.platforms.length) {
+            <p>
+              <strong>Plateformes :</strong>
+              {{ game.platforms.join(', ') }}
+            </p>
+          }
+
+          @if (game.genres.length) {
+            <div class="tags">
+              @for (genre of game.genres; track genre) {
+                <span>
+                  {{ genre }}
+                </span>
+              }
+            </div>
+          }
+
+          <p class="rating">
+            IGDB :
+            {{ igdbRating(game) ?? '—' }}
+            / 100
+          </p>
+
+          <div class="note-section">
+            @if (auth.isAuthenticated()) {
+              <p class="note-label">Votre note</p>
+              <app-note-picker
+                [value]="ratingFor(game)"
+                (valueChange)="rate(game, $event)"
+              />
+            } @else {
+              <p class="note-login">
+                <a routerLink="/login">Connectez-vous</a>
+                pour noter ce jeu
+              </p>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
