@@ -3,7 +3,8 @@ import { DatePipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { phosphorImageDuotone } from '@ng-icons/phosphor-icons/duotone';
+import { phosphorImageDuotone, phosphorXDuotone } from '@ng-icons/phosphor-icons/duotone';
+import { phosphorXBold } from '@ng-icons/phosphor-icons/bold';
 import { debounceTime, distinctUntilChanged, filter, finalize, map, switchMap } from 'rxjs';
 import { IgdbApiService } from '../../data-access/igdb-api.service';
 import { IgdbGame } from '../../models/igdb-game.model';
@@ -18,7 +19,7 @@ import { NotePickerComponent } from '../../../../shared/rating/note-picker.compo
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './igdb-search-page.component.html',
   styleUrl: './igdb-search-page.component.scss',
-  providers: [provideIcons({ phosphorImageDuotone })]
+  providers: [provideIcons({ phosphorImageDuotone, phosphorXDuotone, phosphorXBold })]
 })
 export class IgdbSearchPageComponent {
   private readonly api = inject(IgdbApiService);
@@ -56,7 +57,7 @@ export class IgdbSearchPageComponent {
       })
     ).subscribe({
       next: games => this.results.set(games),
-      error: () => { this.results.set([]); this.error.set('La recherche IGDB est indisponible. Vérifie le backend et tes clés Twitch.  (en vrai, le wifi technifutur bloque igdb et je dois demander de changer)'); }
+      error: () => { this.results.set([]); this.error.set('La recherche IGDB est indisponible. Vérifie le backend et tes clés Twitch.  (en vrai, le réseau technifutur bloque igdb et je dois demander de changer)'); }
     });
   }
 
@@ -81,6 +82,10 @@ export class IgdbSearchPageComponent {
       coverUrl: game.coverUrl,
       releaseDate: game.firstReleaseDate,
       genres: game.genres,
+      summary: game.summary,
+      developers: game.developers,
+      publishers: game.publishers,
+      platforms: game.platforms,
       rating: note
     }).subscribe(saved => {
       const next = new Map(this.ratings());

@@ -65,6 +65,10 @@ export class DiscoverPageComponent {
       coverUrl: game.coverUrl,
       releaseDate: game.firstReleaseDate,
       genres: game.genres,
+      summary: game.summary,
+      developers: game.developers,
+      publishers: game.publishers,
+      platforms: game.platforms,
       rating: note
     }).pipe(
       finalize(() => this.saving.set(false))

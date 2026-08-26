@@ -121,15 +121,6 @@
             [showCurrentValue]="false"
             (valueChange)="updateRating(item, $event)"
           />
-
-          <button
-            type="button"
-            class="remove"
-            [disabled]="removingId() === item.igdbGameId"
-            (click)="remove(item)"
-          >
-            {{ removingId() === item.igdbGameId ? 'Retrait…' : 'Retirer de la collection' }}
-          </button>
         </div>
       </article>
     }
@@ -154,7 +145,10 @@
         aria-label="Fermer"
         (click)="closeModal()"
       >
-        ×
+        <ng-icon
+          name="phosphorXBold"
+          size="1.2rem"
+        />
       </button>
 
       <div class="modal-body">
@@ -186,6 +180,31 @@
           <p class="muted small">
             Noté le {{ item.updatedAt ?? item.createdAt | date: 'longDate' }}
           </p>
+
+          @if (item.summary) {
+            <p class="summary">{{ item.summary }}</p>
+          }
+
+          @if (item.developers.length) {
+            <p>
+              <strong>Développeur :</strong>
+              {{ item.developers.join(', ') }}
+            </p>
+          }
+
+          @if (item.publishers.length) {
+            <p>
+              <strong>Éditeur :</strong>
+              {{ item.publishers.join(', ') }}
+            </p>
+          }
+
+          @if (item.platforms.length) {
+            <p>
+              <strong>Plateformes :</strong>
+              {{ item.platforms.join(', ') }}
+            </p>
+          }
 
           @if (item.genres.length) {
             <div class="tags">

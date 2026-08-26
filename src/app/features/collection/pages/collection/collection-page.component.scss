@@ -255,10 +255,10 @@
 .modal {
   position: relative;
   width: 100%;
-  max-width: 680px;
-  max-height: 90vh;
+  max-width: 870px;
+  max-height: 95vh;
   overflow-y: auto;
-  border-radius: 1rem;
+  border-radius: 16px;
   background: white;
   box-shadow: 0 20px 60px #0f172a40;
 }
@@ -271,6 +271,7 @@
   place-items: center;
   width: 2.2rem;
   height: 2.2rem;
+  padding: 0;
   margin: 0.75rem 0.75rem -2.2rem auto;
   border: 0;
   border-radius: 50%;
@@ -290,8 +291,12 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 
-  @media (min-width: 560px) {
+
+  @media (min-width: 580px) {
     flex-direction: row;
   }
 }
@@ -303,11 +308,17 @@
   object-fit: cover;
   background: #e2e8f0;
   flex-shrink: 0;
+  margin-left: 13px;
+  margin-bottom: 8px;
 
+  border-radius: 8px;
+
+  // Le ratio 3/4 reste toujours respecté, même si la colonne d'infos (synopsis, développeur,
+  // éditeur, plateformes...) devient beaucoup plus haute qu'elle : on aligne juste l'image
+  // en haut plutôt que de l'étirer sur toute la hauteur, ce qui la déformerait.
   @media (min-width: 560px) {
     width: 240px;
-    aspect-ratio: auto;
-    align-self: stretch;
+    align-self: flex-start;
   }
 
   &.placeholder {
@@ -327,6 +338,7 @@
 }
 
 .modal-info {
+  flex: 1;
   padding: 1.5rem;
   min-width: 0;
 
@@ -336,9 +348,18 @@
     color: #172033;
   }
 
+  p {
+    line-height: 1.5;
+  }
+
   .remove {
     margin-top: 1.25rem;
   }
+}
+
+.summary {
+  margin: 0.9rem 0;
+  color: #334155;
 }
 
 .tags {

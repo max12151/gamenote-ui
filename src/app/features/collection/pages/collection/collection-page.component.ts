@@ -2,7 +2,8 @@ import { ChangeDetectionStrategy, Component, HostListener, computed, inject, sig
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { phosphorImageDuotone } from '@ng-icons/phosphor-icons/duotone';
+import { phosphorImageDuotone, phosphorXDuotone } from '@ng-icons/phosphor-icons/duotone';
+import { phosphorXBold } from '@ng-icons/phosphor-icons/bold';
 import { finalize } from 'rxjs';
 import { GameRating } from '../../../../core/models/game-rating.model';
 import { RatingService } from '../../../../core/rating/rating.service';
@@ -19,7 +20,7 @@ type SortDir = 'asc' | 'desc';
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './collection-page.component.html',
   styleUrl: './collection-page.component.scss',
-  providers: [provideIcons({ phosphorImageDuotone })]
+  providers: [provideIcons({ phosphorImageDuotone, phosphorXDuotone, phosphorXBold })]
 })
 export class CollectionPageComponent {
   private readonly ratingService = inject(RatingService);
@@ -92,6 +93,10 @@ export class CollectionPageComponent {
       coverUrl: gameRating.coverUrl,
       releaseDate: gameRating.releaseDate,
       genres: gameRating.genres,
+      summary: gameRating.summary,
+      developers: gameRating.developers,
+      publishers: gameRating.publishers,
+      platforms: gameRating.platforms,
       rating: note
     }).subscribe(saved => {
       this.ratings.update(list => list.map(r => (r.igdbGameId === saved.igdbGameId ? saved : r)));

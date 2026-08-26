@@ -125,20 +125,22 @@
           [formGroup]="form"
           (ngSubmit)="save()"
         >
-          <label for="bio">Bio</label>
+          <label>Avatar</label>
+          <app-avatar-upload
+            [currentAvatarUrl]="avatarUrl()"
+            [initials]="user.username.charAt(0).toUpperCase()"
+            (avatarChange)="onAvatarChange($event)"
+          />
+
+          <label
+            for="bio"
+            class="bio-label"
+          >Bio</label>
           <textarea
             id="bio"
             formControlName="bio"
             rows="4"
           ></textarea>
-
-          <label for="avatarUrl">URL d'avatar</label>
-          <input
-            id="avatarUrl"
-            formControlName="avatarUrl"
-            placeholder="https://…"
-            autocomplete="off"
-          />
 
           <div class="actions">
             <button

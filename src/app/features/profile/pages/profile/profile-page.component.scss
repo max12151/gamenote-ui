@@ -6,7 +6,7 @@
 
 .page {
   width: 100%;
-  max-width: 640px;
+  max-width: 750px;
   margin: 0 auto;
   padding: 2rem 1rem 4rem;
   box-sizing: border-box;
@@ -16,6 +16,7 @@
   padding: 3rem;
   text-align: center;
   color: #64748b;
+  max-height: 0px;
 }
 
 .error {
@@ -33,6 +34,8 @@
   background: white;
   box-shadow: 0 2px 8px #0f172a0a;
   box-sizing: border-box;
+  width: 100%;
+
 }
 
 .header {
@@ -205,6 +208,14 @@
     color: #475569;
     font-size: 0.9rem;
     font-weight: 600;
+  }
+
+  app-avatar-upload {
+    margin-bottom: 1.4rem;
+  }
+
+  .bio-label {
+    margin-top: 0.1rem;
   }
 
   input,

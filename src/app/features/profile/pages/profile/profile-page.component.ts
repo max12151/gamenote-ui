@@ -7,11 +7,12 @@ import { finalize } from 'rxjs';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { RatingStats } from '../../../../core/models/rating-stats.model';
 import { RatingService } from '../../../../core/rating/rating.service';
+import { AvatarUploadComponent } from '../../../../shared/avatar-upload/avatar-upload.component';
 import { ProfileService } from '../../data-access/profile.service';
 
 @Component({
   selector: 'app-profile-page',
-  imports: [ReactiveFormsModule, DatePipe, DecimalPipe],
+  imports: [ReactiveFormsModule, DatePipe, DecimalPipe, AvatarUploadComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './profile-page.component.html',
   styleUrl: './profile-page.component.scss'
@@ -33,9 +34,10 @@ export class ProfilePageComponent {
   readonly stats = signal<RatingStats | null>(null);
   readonly statsLoading = signal(true);
 
+  readonly avatarUrl = signal('');
+
   readonly form = this.fb.nonNullable.group({
-    bio: ['', [Validators.maxLength(1000)]],
-    avatarUrl: ['', [Validators.maxLength(2048)]]
+    bio: ['', [Validators.maxLength(1000)]]
   });
 
   constructor() {
@@ -67,6 +69,10 @@ export class ProfilePageComponent {
     this.editing.set(false);
   }
 
+  onAvatarChange(dataUrl: string | null): void {
+    this.avatarUrl.set(dataUrl ?? '');
+  }
+
   save(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -77,7 +83,10 @@ export class ProfilePageComponent {
     this.error.set('');
     this.success.set('');
 
-    this.profileService.updateProfile(this.form.getRawValue()).pipe(
+    this.profileService.updateProfile({
+      bio: this.form.getRawValue().bio,
+      avatarUrl: this.avatarUrl()
+    }).pipe(
       finalize(() => this.saving.set(false))
     ).subscribe({
       next: () => {
@@ -95,8 +104,8 @@ export class ProfilePageComponent {
 
   private resetFormFrom(user: { bio: string | null; avatarUrl: string | null }): void {
     this.form.setValue({
-      bio: user.bio ?? '',
-      avatarUrl: user.avatarUrl ?? ''
+      bio: user.bio ?? ''
     });
+    this.avatarUrl.set(user.avatarUrl ?? '');
   }
 }

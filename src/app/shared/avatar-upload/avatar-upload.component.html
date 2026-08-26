@@ -1,0 +1,98 @@
+<div class="avatar-upload">
+  @if (!pendingFile()) {
+    <div class="dropzone-row">
+      <div
+        class="preview"
+        [class.drag-over]="dragOver()"
+        role="button"
+        tabindex="0"
+        aria-label="Changer l'avatar : glisser une image ou cliquer"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+        (click)="fileInput.click()"
+        (keydown.enter)="fileInput.click()"
+        (keydown.space)="fileInput.click(); $event.preventDefault()"
+      >
+        @if (currentAvatarUrl()) {
+          <img
+            [src]="currentAvatarUrl()"
+            alt="Avatar actuel"
+          />
+        } @else {
+          <div class="initials">{{ initials() }}</div>
+        }
+
+        <div class="overlay">
+          <ng-icon
+            name="phosphorUploadSimpleDuotone"
+            size="1.4rem"
+          />
+        </div>
+      </div>
+
+      <div class="dropzone-info">
+        <p class="hint">
+          Glisse une image ici ou clique sur l'avatar pour la changer.
+        </p>
+
+        @if (currentAvatarUrl()) {
+          <button
+            type="button"
+            class="remove"
+            (click)="remove()"
+          >
+            <ng-icon name="phosphorTrashSimpleDuotone" />
+            Retirer l'avatar
+          </button>
+        }
+      </div>
+    </div>
+
+    <input
+      #fileInput
+      type="file"
+      accept="image/*"
+      hidden
+      (change)="onFileSelected($event)"
+    />
+
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+  } @else {
+    <div class="cropper-panel">
+      <image-cropper
+        [imageFile]="pendingFile() ?? undefined"
+        [maintainAspectRatio]="true"
+        [aspectRatio]="1"
+        [roundCropper]="true"
+        format="jpeg"
+        [imageQuality]="85"
+        [resizeToWidth]="outputSize"
+        [resizeToHeight]="outputSize"
+        output="base64"
+        (imageCropped)="onCropped($event)"
+        (loadImageFailed)="onLoadFailed()"
+      />
+
+      <div class="cropper-actions">
+        <button
+          type="button"
+          (click)="confirmCrop()"
+        >
+          <ng-icon name="phosphorCheckDuotone" />
+          Valider le cadrage
+        </button>
+
+        <button
+          type="button"
+          class="ghost"
+          (click)="cancelCrop()"
+        >
+          Annuler
+        </button>
+      </div>
+    </div>
+  }
+</div>
