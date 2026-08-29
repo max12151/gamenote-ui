@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, HostListener, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  computed,
+  effect,
+  inject,
+  signal,
+  viewChild
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -65,12 +74,45 @@ export class CollectionPageComponent {
     return sorted;
   });
 
+  private readonly detailDialog = viewChild<ElementRef<HTMLDialogElement>>('detailDialog');
+
   constructor() {
     this.ratingService.getCollection().pipe(
       finalize(() => this.loading.set(false))
     ).subscribe({
       next: ratings => this.ratings.set(ratings),
       error: () => this.error.set('Impossible de charger ta collection.')
+    });
+
+    // Le <dialog> natif est piloté par des méthodes impératives : on se contente de le
+    // synchroniser sur le signal, qui reste la source de vérité pour le template.
+    effect(onCleanup => {
+      const dialog = this.detailDialog()?.nativeElement;
+
+      if (!dialog) {
+        return;
+      }
+
+      const open = this.selectedRating() !== null;
+
+      if (open && !dialog.open) {
+        // showModal() donne le focus au dialog, ce qui pousse le navigateur à faire
+        // défiler le document jusqu'à lui. Deux conséquences si on laisse faire : ouvrir
+        // une fiche depuis le bas d'une longue collection ramène en haut de liste, et
+        // la modal s'affiche décalée du nombre de pixels que le défilement vient de
+        // perdre — tronquée en haut de l'écran. On restaure donc la position aussitôt.
+        const scrollY = window.scrollY;
+        dialog.showModal();
+        window.scrollTo({ top: scrollY, behavior: 'instant' });
+      } else if (!open && dialog.open) {
+        dialog.close();
+      }
+
+      // showModal() rend le reste de la page inerte mais ne bloque pas son défilement :
+      // sans ce verrou, la molette continue de faire défiler la collection derrière.
+      // Le nettoyage couvre aussi la destruction du composant modal encore ouverte.
+      document.documentElement.classList.toggle('modal-open', open);
+      onCleanup(() => document.documentElement.classList.remove('modal-open'));
     });
   }
 
@@ -122,13 +164,26 @@ export class CollectionPageComponent {
     this.selectedRating.set(gameRating);
   }
 
+  /**
+   * Appelée par le bouton, le clic sur le fond, la touche Échap et l'événement natif
+   * `close`. Elle est idempotente, ces chemins pouvant se déclencher ensemble.
+   * <p>
+   * Échap est intercepté explicitement en plus de `(close)` : certains moteurs ne
+   * dispatchent pas l'événement `close`, et le signal resterait alors positionné alors
+   * que le dialog est refermé — page verrouillée, sans modal visible.
+   */
   closeModal(): void {
     this.selectedRating.set(null);
   }
 
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
-    this.closeModal();
+  /**
+   * Le contenu remplit toute la boîte du <dialog> : un clic dont la cible est le dialog
+   * lui-même ne peut donc venir que du ::backdrop.
+   */
+  onBackdropClick(event: MouseEvent): void {
+    if (event.target === this.detailDialog()?.nativeElement) {
+      this.closeModal();
+    }
   }
 
   private compare(a: GameRating, b: GameRating, key: SortKey): number {

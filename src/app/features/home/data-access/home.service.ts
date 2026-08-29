@@ -1,0 +1,19 @@
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { environment } from '../../../../environments/environments';
+import { IgdbGame } from '../../igdb/models/igdb-game.model';
+
+@Injectable({ providedIn: 'root' })
+export class HomeService {
+  private readonly http = inject(HttpClient);
+
+  /**
+   * Jeux pas encore sortis, du plus attendu au moins attendu. Le classement vient du
+   * compteur d'attente d'IGDB, et non d'une note : ces jeux n'en ont pas encore.
+   */
+  getUpcoming(limit = 8): Observable<IgdbGame[]> {
+    const params = new HttpParams().set('limit', limit);
+    return this.http.get<IgdbGame[]>(`${environment.apiUrl}/api/igdb/upcoming`, { params });
+  }
+}

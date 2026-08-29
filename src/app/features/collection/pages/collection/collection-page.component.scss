@@ -1,7 +1,7 @@
 :host {
   display: block;
   min-height: calc(100vh - 4rem);
-  background: #f8fafc;
+  background: var(--gn-bg);
 }
 
 .page {
@@ -22,35 +22,35 @@
 
 .eyebrow {
   margin: 0 0 0.5rem;
-  color: #6d28d9;
+  color: var(--gn-primary);
   font-weight: 700;
   letter-spacing: 0.04em;
 }
 
 .header h1 {
   margin: 0;
-  color: #172033;
+  color: var(--gn-ink);
 }
 
 .header p:not(.eyebrow) {
   max-width: 650px;
   margin: 0.75rem 0 0;
-  color: #475569;
+  color: var(--gn-text-soft);
 }
 
 .state {
   padding: 3rem;
   text-align: center;
-  color: #64748b;
+  color: var(--gn-muted);
 
   a {
-    color: #6d28d9;
+    color: var(--gn-primary);
     font-weight: 600;
   }
 }
 
 .error {
-  color: #b91c1c;
+  color: var(--gn-danger);
 }
 
 .toolbar {
@@ -60,7 +60,7 @@
   gap: 1rem;
   margin-bottom: 1.5rem;
   padding: 0.9rem 1.1rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--gn-border);
   border-radius: 0.7rem;
   background: white;
 
@@ -68,24 +68,24 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: #475569;
+    color: var(--gn-text-soft);
     font-size: 0.85rem;
     font-weight: 600;
   }
 
   select {
     padding: 0.4rem 0.6rem;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--gn-border-strong);
     border-radius: 0.5rem;
     background: white;
-    color: #172033;
+    color: var(--gn-ink);
     font: inherit;
     font-size: 0.85rem;
     outline: none;
 
     &:focus {
-      border-color: #6d28d9;
-      box-shadow: 0 0 0 3px #6d28d933;
+      border-color: var(--gn-primary);
+      box-shadow: var(--gn-focus-ring);
     }
   }
 }
@@ -95,23 +95,23 @@
   place-items: center;
   width: 2rem;
   height: 2rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--gn-border-strong);
   border-radius: 0.5rem;
   background: white;
-  color: #475569;
+  color: var(--gn-text-soft);
   cursor: pointer;
   font-size: 1rem;
   font-weight: 700;
   transition: background 0.15s;
 
   &:hover {
-    background: #f1f5f9;
+    background: var(--gn-surface-alt);
   }
 }
 
 .count {
   margin-left: auto;
-  color: #94a3b8;
+  color: var(--gn-subtle);
   font-size: 0.85rem;
 }
 
@@ -123,14 +123,14 @@
 
 .card {
   overflow: hidden;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--gn-border);
   border-radius: 0.8rem;
   background: white;
-  box-shadow: 0 2px 8px #0f172a0a;
+  box-shadow: var(--gn-shadow-sm);
   transition: box-shadow 0.2s;
 
   &:hover {
-    box-shadow: 0 8px 20px #0f172a18;
+    box-shadow: var(--gn-shadow-lg);
   }
 }
 
@@ -144,7 +144,7 @@
   cursor: pointer;
 
   &:focus-visible {
-    outline: 2px solid #6d28d9;
+    outline: 2px solid var(--gn-primary);
     outline-offset: -2px;
   }
 
@@ -154,7 +154,7 @@
     width: 100%;
     aspect-ratio: 3 / 4;
     object-fit: cover;
-    background: #e2e8f0;
+    background: var(--gn-border);
   }
 
   .placeholder {
@@ -163,8 +163,8 @@
     align-items: center;
     justify-content: center;
     gap: 0.4rem;
-    color: #94a3b8;
-    background: #f1f5f9;
+    color: var(--gn-subtle);
+    background: var(--gn-surface-alt);
 
     span {
       font-size: 0.8rem;
@@ -175,13 +175,13 @@
   h2 {
     margin: 0;
     padding: 0.85rem 1rem 0;
-    color: #172033;
+    color: var(--gn-ink);
     font-size: 1.05rem;
     transition: color 0.15s;
   }
 
   &:hover h2 {
-    color: #6d28d9;
+    color: var(--gn-primary);
   }
 }
 
@@ -190,7 +190,7 @@
 }
 
 .muted {
-  color: #64748b;
+  color: var(--gn-muted);
 }
 
 .small {
@@ -209,7 +209,7 @@
 .rating-badge {
   flex-shrink: 0;
   padding: 0.15rem 0.55rem;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--gn-border);
   border-radius: 0.4rem;
   font-weight: 800;
   font-size: 0.85rem;
@@ -224,7 +224,7 @@
   border-radius: 0.5rem;
   padding: 0.5rem 0.75rem;
   background: transparent;
-  color: #b91c1c;
+  color: var(--gn-danger);
   cursor: pointer;
   font: inherit;
   font-size: 0.85rem;
@@ -232,7 +232,7 @@
   transition: background 0.2s;
 
   &:hover:not(:disabled) {
-    background: #fef2f2;
+    background: var(--gn-danger-soft);
   }
 
   &:disabled {
@@ -241,84 +241,142 @@
   }
 }
 
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 1.5rem;
-  background: #0f172acc;
-  z-index: 100;
-  box-sizing: border-box;
-}
+
+// --- Modal de détail -------------------------------------------------------------
+// Élément <dialog> natif : le fond sombre est fourni par ::backdrop, plus besoin d'une
+// div englobante. La modal est une colonne flex dont seul le corps défile, ce qui évite
+// la barre de défilement qui traversait auparavant toute la boîte et écrasait les
+// coins arrondis.
 
 .modal {
-  position: relative;
-  width: 100%;
-  max-width: 870px;
-  max-height: 95vh;
-  overflow-y: auto;
+  display: none;
+
+  // Surtout pas de `position` ici : la feuille de style du navigateur pose déjà
+  // `position: fixed` sur `dialog:modal`, et l'écraser (même par `relative`) replace la
+  // modal dans le flux du document — elle défile alors avec la page et sort de l'écran.
+  // `fixed` sert aussi de référence au bouton de fermeture en `position: absolute`.
+  // `inset: 0` + `margin: auto` centre exactement dans les deux axes, sans dépendre des
+  // marges par défaut que le navigateur applique à <dialog> (qui décalaient la boîte
+  // d'une quinzaine de pixels vers le bas).
+  inset: 0;
+  margin: auto;
+  width: min(100% - 3rem, 870px);
+  max-width: none;
+  max-height: min(95vh, 780px);
+  padding: 0;
+  border: 0;
   border-radius: 16px;
   background: white;
-  box-shadow: 0 20px 60px #0f172a40;
+  color: inherit;
+  box-shadow: var(--gn-shadow-xl);
+  overflow: hidden;
+
+  &[open] {
+    display: flex;
+    flex-direction: column;
+    animation: modal-in 0.18s ease-out;
+  }
+
+  &::backdrop {
+    background: var(--gn-backdrop);
+  }
+
+  &[open]::backdrop {
+    animation: backdrop-in 0.18s ease-out;
+  }
+}
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+@keyframes backdrop-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal[open],
+  .modal[open]::backdrop {
+    animation: none;
+  }
 }
 
 .modal-close {
-  position: sticky;
+  position: absolute;
   top: 0.75rem;
-  left: 100%;
+  right: 0.75rem;
   display: grid;
   place-items: center;
   width: 2.2rem;
   height: 2.2rem;
   padding: 0;
-  margin: 0.75rem 0.75rem -2.2rem auto;
+  margin: 0;
   border: 0;
   border-radius: 50%;
-  background: #172033cc;
+  background: color-mix(in srgb, var(--gn-ink) 80%, transparent);
   color: white;
   cursor: pointer;
   font-size: 1.3rem;
   line-height: 1;
-  z-index: 1;
+  z-index: 2;
+  backdrop-filter: blur(4px);
+  transition: background 0.15s;
 
   &:hover {
-    background: #172033;
+    background: var(--gn-ink);
   }
 }
 
 .modal-body {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  flex: 1;
-  min-height: 0;
+  gap: 1.25rem;
+  padding: 1.25rem;
   overflow-y: auto;
 
+  // Arrivé en bout de course, le défilement ne se propage plus à la page derrière.
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gn-border-strong) transparent;
 
-  @media (min-width: 580px) {
+  // 700px et non 580 : en dessous, la jaquette (240px) et les gouttières ne laissaient
+  // qu'une colonne de texte d'environ 240px, où le synopsis se hachait en lignes de
+  // quatre mots. Mieux vaut empiler tant qu'il n'y a pas la place pour les deux.
+  @media (min-width: 700px) {
     flex-direction: row;
   }
 }
 
 .modal-cover {
   display: block;
+
+  // Empilée, une jaquette pleine largeur en ratio 3/4 remplissait tout le premier écran
+  // avant le moindre mot : on la plafonne et on la centre, comme une affiche.
   width: 100%;
+  max-width: 220px;
+  align-self: center;
   aspect-ratio: 3 / 4;
   object-fit: cover;
-  background: #e2e8f0;
+  margin: 0;
+  border-radius: 10px;
+  background: var(--gn-border);
   flex-shrink: 0;
-  margin-left: 13px;
-  margin-bottom: 8px;
 
-  border-radius: 8px;
-
-  // Le ratio 3/4 reste toujours respecté, même si la colonne d'infos (synopsis, développeur,
-  // éditeur, plateformes...) devient beaucoup plus haute qu'elle : on aligne juste l'image
-  // en haut plutôt que de l'étirer sur toute la hauteur, ce qui la déformerait.
-  @media (min-width: 560px) {
+  // Le ratio 3/4 reste toujours respecté, même si la colonne d'infos (synopsis,
+  // développeur, éditeur, plateformes...) devient beaucoup plus haute qu'elle : on aligne
+  // l'image en haut plutôt que de l'étirer, ce qui la déformerait. Elle reste ensuite
+  // collée en place pendant que le texte défile.
+  @media (min-width: 700px) {
     width: 240px;
+    max-width: none;
     align-self: flex-start;
+    position: sticky;
+    top: 0;
   }
 
   &.placeholder {
@@ -327,8 +385,8 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    color: #94a3b8;
-    background: #f1f5f9;
+    color: var(--gn-subtle);
+    background: var(--gn-surface-alt);
 
     span {
       font-size: 0.85rem;
@@ -339,17 +397,18 @@
 
 .modal-info {
   flex: 1;
-  padding: 1.5rem;
   min-width: 0;
 
   h2 {
-    margin-top: 0;
-    margin-bottom: 0.5rem;
-    color: #172033;
+    // Laisse la place au bouton de fermeture, qui flotte au-dessus du coin haut-droit.
+    margin: 0 0 0.5rem;
+    padding-right: 2.25rem;
+    font-size: 1.5rem;
+    color: var(--gn-ink);
   }
 
   p {
-    line-height: 1.5;
+    line-height: 1.55;
   }
 
   .remove {
@@ -357,22 +416,60 @@
   }
 }
 
+// Les deux dates se ressemblaient trop pour être empilées : sur une seule ligne, en
+// retrait, elles redeviennent une information secondaire et non un concurrent du titre.
+.dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 0.9rem;
+  color: var(--gn-subtle);
+  font-size: 0.9rem;
+
+  span + span::before {
+    content: '·';
+    margin-right: 0.5rem;
+    color: var(--gn-border-strong);
+  }
+}
+
 .summary {
-  margin: 0.9rem 0;
-  color: #334155;
+  // Au-delà d'une soixantaine de caractères, l'œil peine à retrouver le début de la
+  // ligne suivante ; la colonne d'infos est bien plus large que ça.
+  max-width: 62ch;
+  margin: 0 0 1rem;
+  color: var(--gn-text);
+}
+
+.meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 1rem;
+  margin: 0;
+  font-size: 0.9rem;
+
+  dt {
+    color: var(--gn-subtle);
+    font-weight: 600;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--gn-text);
+  }
 }
 
 .tags {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  margin: 0.9rem 0 0;
+  margin: 1rem 0 0;
 
   span {
     padding: 0.25rem 0.6rem;
     border-radius: 99px;
-    background: #ede9fe;
-    color: #5b21b6;
+    background: var(--gn-primary-soft);
+    color: var(--gn-primary-deep);
     font-size: 0.82rem;
   }
 }
@@ -380,12 +477,19 @@
 .note-section {
   margin-top: 1.25rem;
   padding-top: 1.25rem;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid var(--gn-border);
+
+  // Pleine hauteur, la barre de notation happait le regard avant le titre. On la
+  // resserre sans passer en variante "compact", qui supprimerait les chiffres alors
+  // que noter est justement l'action principale de cette modal.
+  app-note-picker {
+    --note-picker-height: 1.25rem;
+  }
 }
 
 .note-label {
   margin: 0 0 0.6rem;
-  color: #475569;
+  color: var(--gn-text-soft);
   font-size: 0.9rem;
   font-weight: 600;
 }

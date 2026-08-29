@@ -1,0 +1,231 @@
+:host {
+  display: block;
+  min-height: calc(100vh - 4rem);
+  background: var(--gn-bg);
+}
+
+.page {
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.eyebrow {
+  margin: 0 0 0.5rem;
+  color: var(--gn-primary);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.header h1 {
+  margin: 0;
+  color: var(--gn-ink);
+}
+
+.header p:not(.eyebrow) {
+  max-width: 620px;
+  margin: 0.75rem 0 0;
+  color: var(--gn-text-soft);
+}
+
+.state {
+  padding: 3rem;
+  text-align: center;
+  color: var(--gn-muted);
+}
+
+.error {
+  color: var(--gn-danger);
+}
+
+.total {
+  margin: 0 0 0.85rem;
+  color: var(--gn-subtle);
+  font-size: 0.85rem;
+  text-align: right;
+}
+
+.ranking {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  display: grid;
+  grid-template-columns: 2.5rem 3.25rem 1fr auto;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.7rem 1rem 0.7rem 0.6rem;
+  border: 1px solid var(--gn-border);
+  border-radius: 0.8rem;
+  background: white;
+  box-shadow: var(--gn-shadow-sm);
+  text-decoration: none;
+  transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+
+  &:hover {
+    border-color: var(--gn-primary-soft);
+    box-shadow: var(--gn-shadow-lg);
+    transform: translateY(-1px);
+  }
+}
+
+.position {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  color: var(--gn-subtle);
+  font-size: 0.9rem;
+  font-weight: 700;
+
+  ng-icon {
+    font-size: 1.25rem;
+  }
+}
+
+.rank-number::before {
+  content: '#';
+  opacity: 0.55;
+}
+
+/*
+ * Les trois premiers portent une medaille et un liseré teinte, pour que la tete du
+ * classement se distingue au premier coup d'oeil au lieu de se fondre dans la liste.
+ */
+.podium {
+  border-color: color-mix(in srgb, var(--medal) 45%, var(--gn-border));
+  background:
+    linear-gradient(90deg, color-mix(in srgb, var(--medal) 10%, transparent), transparent 22rem),
+    var(--gn-surface);
+
+  .position {
+    color: var(--medal);
+  }
+
+  &[data-rank='1'] {
+    --medal: #d4a017;
+  }
+
+  &[data-rank='2'] {
+    --medal: #94a3b8;
+  }
+
+  &[data-rank='3'] {
+    --medal: #b06a34;
+  }
+}
+
+.cover {
+  display: block;
+  width: 3.25rem;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 0.35rem;
+  background: var(--gn-border);
+
+  &.placeholder {
+    display: grid;
+    place-items: center;
+    color: var(--gn-subtle);
+    background: var(--gn-surface-alt);
+  }
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.title {
+  color: var(--gn-ink);
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--gn-subtle);
+  font-size: 0.82rem;
+}
+
+.comments {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+
+  ng-icon {
+    font-size: 1rem;
+  }
+}
+
+.average {
+  font-size: 1.35rem;
+  font-weight: 700;
+  white-space: nowrap;
+
+  small {
+    font-size: 0.75rem;
+    font-weight: 600;
+    opacity: 0.6;
+  }
+}
+
+.load-more {
+  display: block;
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: 0.75rem;
+  border: 1px solid var(--gn-border-strong);
+  border-radius: 0.6rem;
+  background: white;
+  color: var(--gn-text-soft);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  transition: background 0.15s;
+
+  &:hover:not(:disabled) {
+    background: var(--gn-surface-alt);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+@media (max-width: 520px) {
+  .card {
+    grid-template-columns: 1.75rem 2.75rem 1fr auto;
+    gap: 0.6rem;
+  }
+
+  .cover {
+    width: 2.75rem;
+  }
+
+  .average {
+    font-size: 1.15rem;
+  }
+}

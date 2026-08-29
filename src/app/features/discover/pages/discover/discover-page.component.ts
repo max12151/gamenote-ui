@@ -36,7 +36,12 @@ export class DiscoverPageComponent {
   readonly saving = signal(false);
   readonly justRated = signal<number | null>(null);
 
-  private offset = 0;
+  /**
+   * Jeux déjà proposés depuis le chargement de la page. Le serveur tire au hasard dans un
+   * vivier de jeux populaires : sans cette mémoire de session, un jeu vu il y a trois lots
+   * mais ni noté ni passé pourrait ressortir. La liste est bornée par la taille du vivier.
+   */
+  private readonly seenIds = new Set<number>();
 
   constructor() {
     this.loadBatch(true);
@@ -44,10 +49,10 @@ export class DiscoverPageComponent {
 
   onGenreChange(genre: string): void {
     this.selectedGenre.set(genre);
-    this.offset = 0;
     this.exhausted.set(false);
     this.error.set('');
     this.queue.set([]);
+    this.seenIds.clear();
     this.loadBatch(true);
   }
 
@@ -83,9 +88,19 @@ export class DiscoverPageComponent {
   }
 
   skip(): void {
-    if (!this.saving()) {
-      this.advance();
+    const game = this.current();
+    if (!game || this.saving()) {
+      return;
     }
+
+    // On passe au jeu suivant sans attendre la réponse : l'enregistrement du délai de
+    // réapparition ne doit pas se payer d'un temps d'attente à chaque "Passer". Le jeu
+    // reste de toute façon écarté de cette session par seenIds si l'appel échoue.
+    this.advance();
+
+    this.discoverService.skipGame(game.igdbId).subscribe({
+      error: () => this.error.set("Ce jeu n'a pas pu être mis de côté, il pourra réapparaître.")
+    });
   }
 
   private advance(): void {
@@ -105,16 +120,20 @@ export class DiscoverPageComponent {
       this.loading.set(true);
     }
 
-    this.discoverService.getGames(this.selectedGenre() || null, BATCH_SIZE, this.offset).pipe(
+    this.discoverService.getGames(this.selectedGenre() || null, BATCH_SIZE, [...this.seenIds]).pipe(
       finalize(() => this.loading.set(false))
     ).subscribe({
       next: games => {
-        this.offset += BATCH_SIZE;
         if (games.length === 0) {
           this.exhausted.set(true);
-        } else {
-          this.queue.update(list => [...list, ...games]);
+          return;
         }
+
+        for (const game of games) {
+          this.seenIds.add(game.igdbId);
+        }
+
+        this.queue.update(list => [...list, ...games]);
       },
       error: (err: HttpErrorResponse) => this.error.set(err.error?.message ?? 'Impossible de charger des suggestions.')
     });

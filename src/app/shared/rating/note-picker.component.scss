@@ -17,12 +17,15 @@
 
 .segment {
   flex: 1;
-  height: 1.6rem;
+
+  // Exposée en variable CSS pour que les pages hôtes puissent resserrer la barre sans
+  // recourir à ::ng-deep : les custom properties traversent les frontières de composant.
+  height: var(--note-picker-height, 1.6rem);
   min-width: 0;
   border: none;
   border-radius: 0.2rem;
-  background: #e2e8f0;
-  color: #94a3b8;
+  background: var(--gn-border);
+  color: var(--gn-subtle);
   cursor: pointer;
   font: inherit;
   font-size: 0.65rem;

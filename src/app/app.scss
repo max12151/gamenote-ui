@@ -10,7 +10,7 @@
   height: 4rem;
   padding: 0 1.5rem;
   box-sizing: border-box;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid var(--gn-border);
   background: white;
   position: sticky;
   top: 0;
@@ -22,13 +22,13 @@
   align-items: center;
   gap: 0.4rem;
   justify-self: start;
-  color: #6d28d9;
+  color: var(--gn-primary);
   font-weight: 700;
   text-decoration: none;
   letter-spacing: -0.01em;
 
   ng-icon {
-    color: #6d28d9;
+    color: var(--gn-primary);
   }
 }
 
@@ -56,7 +56,7 @@
   border: 1px solid transparent;
   border-radius: 0.55rem;
   padding: 0.5rem 0.75rem;
-  color: #475569;
+  color: var(--gn-text-soft);
   text-decoration: none;
   cursor: pointer;
   background: transparent;
@@ -70,22 +70,22 @@
   }
 
   &:hover {
-    background: #f5f3ff;
-    color: #172033;
+    background: var(--gn-primary-tint);
+    color: var(--gn-ink);
   }
 }
 
 .links a.active {
-  background: #ede9fe;
-  color: #6d28d9;
+  background: var(--gn-primary-soft);
+  color: var(--gn-primary);
 }
 
 .actions .cta {
-  background: #6d28d9;
+  background: var(--gn-primary);
   color: white;
 
   &:hover {
-    background: #5b21b6;
+    background: var(--gn-primary-deep);
     color: white;
   }
 }

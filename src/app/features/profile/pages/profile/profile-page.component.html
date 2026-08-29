@@ -77,7 +77,7 @@
                 @if (best.coverUrl) {
                   <img
                     [src]="best.coverUrl"
-                    [alt]="'Couverture de ' + best.title"
+                    [alt]="'Cover de ' + best.title"
                   />
                 }
                 <div>
@@ -87,20 +87,114 @@
               </div>
             }
 
-            @if (s.genreBreakdown.length) {
-              <div class="genre-breakdown">
-                @for (g of s.genreBreakdown; track g.genre) {
-                  <div class="genre-row">
-                    <span class="genre-name">{{ g.genre }}</span>
-                    <div class="genre-bar">
-                      <div
-                        class="genre-bar-fill"
-                        [style.width.%]="(g.count / s.genreBreakdown[0].count) * 100"
-                      ></div>
-                    </div>
-                    <span class="genre-count">{{ g.count }}</span>
+            <div class="chart">
+              <h3>Comment je note</h3>
+              <p class="chart-caption">Répartition de mes {{ s.totalRated }} notes</p>
+
+              <div
+                class="histogram"
+                role="img"
+                [attr.aria-label]="'Répartition de mes notes sur ' + s.totalRated + ' jeux'"
+              >
+                @for (bucket of s.ratingDistribution; track bucket.rating) {
+                  <div class="hist-col">
+                    <span class="hist-count">{{ bucket.count || '' }}</span>
+                    <span class="hist-track">
+                      <span
+                        class="hist-bar"
+                        [style.height]="barHeight(bucket.count)"
+                        [style.background]="bucket.count ? ratingColor(bucket.rating) : null"
+                        [class.empty]="!bucket.count"
+                      ></span>
+                    </span>
+                    <span class="hist-note">{{ bucket.rating }}</span>
                   </div>
                 }
+              </div>
+            </div>
+
+            @if (s.genreBreakdown.length) {
+              <div class="chart">
+                <h3>Mes genres</h3>
+                <p class="chart-caption">Les genres les plus présents dans ma collection</p>
+
+                <div class="genre-breakdown">
+                  @for (g of s.genreBreakdown; track g.genre) {
+                    <div class="genre-row">
+                      <span class="genre-name">{{ g.genre }}</span>
+                      <div class="genre-bar">
+                        <div
+                          class="genre-bar-fill"
+                          [style.width.%]="(g.count / s.genreBreakdown[0].count) * 100"
+                        ></div>
+                      </div>
+                      <span class="genre-count">{{ g.count }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (s.tasteComparison.comparedGames > 0) {
+              <div class="chart">
+                <h3>Moi face au site</h3>
+                <p class="chart-caption">
+                  Sur {{ s.tasteComparison.comparedGames }} jeu{{ s.tasteComparison.comparedGames > 1 ? 'x' : '' }}
+                  noté{{ s.tasteComparison.comparedGames > 1 ? 's' : '' }} par plusieurs joueurs
+                </p>
+
+                <div class="taste">
+                  <div class="taste-delta">
+                    <span
+                      class="delta-value"
+                      [class.strict]="s.tasteComparison.averageDelta < -0.3"
+                      [class.generous]="s.tasteComparison.averageDelta > 0.3"
+                    >
+                      {{ formatDelta(s.tasteComparison.averageDelta) }}
+                    </span>
+                    <span class="delta-unit">point d'écart moyen</span>
+                  </div>
+
+                  <p class="verdict">{{ tasteVerdict(s.tasteComparison.averageDelta) }}</p>
+                </div>
+
+                <div
+                  class="split"
+                  role="img"
+                  [attr.aria-label]="
+                    s.tasteComparison.stricter + ' jeux notés plus sévèrement, ' +
+                    s.tasteComparison.aligned + ' dans la moyenne, ' +
+                    s.tasteComparison.generous + ' plus généreusement'
+                  "
+                >
+                  <span
+                    class="seg strict"
+                    [style.width.%]="sharePercent(s.tasteComparison.stricter, s.tasteComparison.comparedGames)"
+                  ></span>
+                  <span
+                    class="seg aligned"
+                    [style.width.%]="sharePercent(s.tasteComparison.aligned, s.tasteComparison.comparedGames)"
+                  ></span>
+                  <span
+                    class="seg generous"
+                    [style.width.%]="sharePercent(s.tasteComparison.generous, s.tasteComparison.comparedGames)"
+                  ></span>
+                </div>
+
+                <ul class="legend">
+                  <li>
+                    <span class="dot strict"></span>
+                    Plus sévère ({{ s.tasteComparison.stricter }})
+                  </li>
+                  <li>
+                    <span class="dot aligned"></span>
+                    Dans la moyenne ({{ s.tasteComparison.aligned }})
+                  </li>
+                  <li>
+                    <span class="dot generous"></span>
+                    Plus généreux ({{ s.tasteComparison.generous }})
+                  </li>
+                </ul>
               </div>
             }
           }

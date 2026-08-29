@@ -1,0 +1,103 @@
+<div class="page">
+  <header class="header">
+    <p class="eyebrow">GameNote · Avis des joueurs</p>
+    <h1>Le classement de la communauté</h1>
+    <p>
+      La moyenne des notes de tous les joueurs du site, du mieux noté au moins bien noté.
+      Ouvre un jeu pour voir le détail des notes et lire les avis.
+    </p>
+  </header>
+
+  @if (error()) {
+    <p class="state error">
+      {{ error() }}
+    </p>
+  }
+
+  @if (loading()) {
+    <p class="state">
+      Calcul des moyennes…
+    </p>
+  } @else if (games().length === 0 && !error()) {
+    <p class="state">
+      Aucun jeu n'a encore été noté sur le site. Sois le premier !
+    </p>
+  } @else {
+    <p class="total">
+      {{ totalGames() }} jeu{{ totalGames() > 1 ? 'x' : '' }} noté{{ totalGames() > 1 ? 's' : '' }} par la communauté
+    </p>
+
+    <ol
+      class="ranking"
+      aria-label="Classement des jeux par note moyenne"
+    >
+      @for (game of games(); track game.igdbGameId; let index = $index) {
+        <li>
+          <a
+            class="card"
+            [class.podium]="index < 3"
+            [attr.data-rank]="index + 1"
+            [routerLink]="['/avis', game.igdbGameId]"
+          >
+            <span class="position">
+              @if (index < 3) {
+                <ng-icon name="phosphorMedalDuotone" />
+              }
+              <span class="rank-number">{{ index + 1 }}</span>
+            </span>
+
+            @if (game.coverUrl) {
+              <img
+                class="cover"
+                [src]="game.coverUrl"
+                [alt]="'Cover de ' + game.title"
+                loading="lazy"
+              />
+            } @else {
+              <span class="cover placeholder">
+                <ng-icon
+                  name="phosphorImageDuotone"
+                  size="1.75rem"
+                />
+              </span>
+            }
+
+            <span class="details">
+              <span class="title">{{ game.title }}</span>
+
+              <span class="meta">
+                {{ game.ratingCount }} vote{{ game.ratingCount > 1 ? 's' : '' }}
+
+                @if (game.commentCount > 0) {
+                  <span class="comments">
+                    <ng-icon name="phosphorChatsCircleDuotone" />
+                    {{ game.commentCount }}
+                  </span>
+                }
+              </span>
+            </span>
+
+            <span
+              class="average"
+              [style.color]="ratingColor(game.averageRating)"
+            >
+              {{ formatAverage(game.averageRating) }}
+              <small>/10</small>
+            </span>
+          </a>
+        </li>
+      }
+    </ol>
+
+    @if (hasMore()) {
+      <button
+        type="button"
+        class="load-more"
+        [disabled]="loadingMore()"
+        (click)="loadMore()"
+      >
+        {{ loadingMore() ? 'Chargement…' : 'Voir plus de jeux' }}
+      </button>
+    }
+  }
+</div>

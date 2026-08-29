@@ -1,0 +1,230 @@
+<section class="hero">
+  <div class="hero-inner">
+    <p class="eyebrow">GameNote</p>
+    <h1>Note ce que tu joues, découvre ce qui arrive</h1>
+    <p class="lead">
+      Cherche un jeu pour lui mettre une note, regarde ce que la communauté a préféré,
+      et garde un œil sur les sorties les plus attendues.
+    </p>
+
+    <div class="search">
+      <ng-icon
+        name="phosphorMagnifyingGlassDuotone"
+        size="1.4rem"
+      />
+
+      <label
+        class="sr-only"
+        for="home-search"
+      >
+        Rechercher un jeu
+      </label>
+      <input
+        id="home-search"
+        type="search"
+        placeholder="Chercher un jeu à noter…"
+        autocomplete="off"
+        [formControl]="query"
+      />
+
+      @if (hasQuery()) {
+        <button
+          type="button"
+          class="clear"
+          (click)="clearSearch()"
+        >
+          Effacer
+        </button>
+      }
+    </div>
+  </div>
+</section>
+
+<div class="page">
+  @if (hasQuery()) {
+    <section
+      class="block"
+      aria-label="Résultats de recherche"
+    >
+      <header class="block-head">
+        <h2>Résultats</h2>
+        @if (searching()) {
+          <span class="hint">Recherche…</span>
+        }
+      </header>
+
+      @if (searchError()) {
+        <p class="state error">{{ searchError() }}</p>
+      } @else if (!searching() && results().length === 0) {
+        <p class="state">Aucun jeu ne correspond à cette recherche.</p>
+      } @else {
+        <div class="grid">
+          @for (game of results(); track game.igdbId) {
+            <article class="game-card">
+              @if (game.coverUrl) {
+                <img
+                  class="cover"
+                  [src]="game.coverUrl"
+                  [alt]="'Jaquette de ' + game.title"
+                  loading="lazy"
+                />
+              } @else {
+                <div class="cover placeholder">
+                  <ng-icon
+                    name="phosphorImageDuotone"
+                    size="2rem"
+                  />
+                </div>
+              }
+
+              <div class="game-body">
+                <h3>{{ game.title }}</h3>
+
+                @if (game.firstReleaseDate) {
+                  <p class="muted">{{ game.firstReleaseDate * 1000 | date: 'y' }}</p>
+                }
+
+                @if (auth.isAuthenticated()) {
+                  <app-note-picker
+                    [value]="ratingFor(game)"
+                    [showCurrentValue]="false"
+                    (valueChange)="rate(game, $event)"
+                  />
+                } @else {
+                  <a
+                    class="login-hint"
+                    routerLink="/login"
+                  >
+                    Connecte-toi pour noter
+                  </a>
+                }
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  }
+
+  <section
+    class="block"
+    aria-label="Les mieux notés du site"
+  >
+    <header class="block-head">
+      <h2>
+        <ng-icon name="phosphorTrophyDuotone" />
+        Les mieux notés du site
+      </h2>
+      <a
+        class="more"
+        routerLink="/avis"
+      >
+        Voir tout le classement
+      </a>
+    </header>
+
+    @if (topLoading()) {
+      <p class="state">Calcul des moyennes…</p>
+    } @else if (topGames().length === 0) {
+      <p class="state">Aucun jeu n'a encore été noté. Sois le premier !</p>
+    } @else {
+      <ol class="podium">
+        @for (game of topGames(); track game.igdbGameId; let index = $index) {
+          <li>
+            <a [routerLink]="['/avis', game.igdbGameId]">
+              <span class="rank">#{{ index + 1 }}</span>
+
+              @if (game.coverUrl) {
+                <img
+                  [src]="game.coverUrl"
+                  [alt]="'Jaquette de ' + game.title"
+                  loading="lazy"
+                />
+              } @else {
+                <span class="cover placeholder">
+                  <ng-icon
+                    name="phosphorImageDuotone"
+                    size="1.5rem"
+                  />
+                </span>
+              }
+
+              <span class="podium-body">
+                <span class="title">{{ game.title }}</span>
+                <span class="muted">
+                  {{ game.ratingCount }} vote{{ game.ratingCount > 1 ? 's' : '' }}
+                </span>
+              </span>
+
+              <span
+                class="score"
+                [style.color]="ratingColor(game.averageRating)"
+              >
+                {{ formatAverage(game.averageRating) }}
+              </span>
+            </a>
+          </li>
+        }
+      </ol>
+    }
+  </section>
+
+  <section
+    class="block"
+    aria-label="Sorties à venir"
+  >
+    <header class="block-head">
+      <h2>
+        <ng-icon name="phosphorCalendarBlankDuotone" />
+        Les sorties les plus attendues
+      </h2>
+    </header>
+
+    @if (upcomingLoading()) {
+      <p class="state">Chargement des prochaines sorties…</p>
+    } @else if (upcomingError()) {
+      <p class="state error">{{ upcomingError() }}</p>
+    } @else if (upcoming().length === 0) {
+      <p class="state">Aucune sortie annoncée pour l'instant.</p>
+    } @else {
+      <div class="grid upcoming">
+        @for (game of upcoming(); track game.igdbId) {
+          <article class="game-card">
+            @if (game.coverUrl) {
+              <img
+                class="cover"
+                [src]="game.coverUrl"
+                [alt]="'Jaquette de ' + game.title"
+                loading="lazy"
+              />
+            } @else {
+              <div class="cover placeholder">
+                <ng-icon
+                  name="phosphorImageDuotone"
+                  size="2rem"
+                />
+              </div>
+            }
+
+            @if (game.hypes) {
+              <span class="hype">
+                <ng-icon name="phosphorFireDuotone" />
+                {{ game.hypes }}
+              </span>
+            }
+
+            <div class="game-body">
+              <h3>{{ game.title }}</h3>
+
+              <p class="release">
+                {{ game.firstReleaseDate ? (game.firstReleaseDate * 1000 | date: 'longDate') : 'Date à confirmer' }}
+              </p>
+
+              <p class="countdown">{{ countdown(game.firstReleaseDate) }}</p>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </section>
+</div>

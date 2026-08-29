@@ -2,7 +2,11 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'igdb' },
+  {
+    path: '',
+    pathMatch: 'full',
+    loadComponent: () => import('./features/home/pages/home/home-page.component').then(m => m.HomePageComponent)
+  },
   { path: 'igdb', loadComponent: () => import('./features/igdb/pages/igdb-search/igdb-search-page.component').then(m => m.IgdbSearchPageComponent) },
   { path: 'login', loadComponent: () => import('./features/auth/pages/login/login-page.component').then(m => m.LoginPageComponent) },
   { path: 'register', loadComponent: () => import('./features/auth/pages/register/register-page.component').then(m => m.RegisterPageComponent) },
@@ -21,5 +25,15 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./features/discover/pages/discover/discover-page.component').then(m => m.DiscoverPageComponent)
   },
-  { path: '**', redirectTo: 'igdb' },
+  {
+    path: 'avis',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/community/pages/community/community-page.component').then(m => m.CommunityPageComponent)
+  },
+  {
+    path: 'avis/:igdbGameId',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/community/pages/community-game/community-game-page.component').then(m => m.CommunityGamePageComponent)
+  },
+  { path: '**', redirectTo: '' },
 ];

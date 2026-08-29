@@ -2,7 +2,9 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
+  phosphorChatsCircleDuotone,
   phosphorCompassDuotone,
+  phosphorHouseDuotone,
   phosphorGameControllerDuotone,
   phosphorMagnifyingGlassDuotone,
   phosphorSignInDuotone,
@@ -21,7 +23,9 @@ import { AuthService } from './core/auth/auth.service';
   styleUrl: './app.scss',
   providers: [
     provideIcons({
+      phosphorChatsCircleDuotone,
       phosphorCompassDuotone,
+      phosphorHouseDuotone,
       phosphorGameControllerDuotone,
       phosphorMagnifyingGlassDuotone,
       phosphorStackDuotone,

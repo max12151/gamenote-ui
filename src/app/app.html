@@ -1,6 +1,6 @@
 <nav class="nav">
   <a
-    routerLink="/igdb"
+    routerLink="/"
     class="brand"
   >
     <ng-icon
@@ -11,6 +11,15 @@
   </a>
 
   <div class="links">
+    <a
+      routerLink="/"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      <ng-icon name="phosphorHouseDuotone" />
+      <span>Accueil</span>
+    </a>
+
     <a
       routerLink="/igdb"
       routerLinkActive="active"
@@ -26,6 +35,14 @@
       >
         <ng-icon name="phosphorCompassDuotone" />
         <span>Découvrir</span>
+      </a>
+
+      <a
+        routerLink="/avis"
+        routerLinkActive="active"
+      >
+        <ng-icon name="phosphorChatsCircleDuotone" />
+        <span>Avis des joueurs</span>
       </a>
 
       <a

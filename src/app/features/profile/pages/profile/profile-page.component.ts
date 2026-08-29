@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -9,6 +9,7 @@ import { RatingStats } from '../../../../core/models/rating-stats.model';
 import { RatingService } from '../../../../core/rating/rating.service';
 import { AvatarUploadComponent } from '../../../../shared/avatar-upload/avatar-upload.component';
 import { ProfileService } from '../../data-access/profile.service';
+import { ratingColor } from '../../../../shared/rating/rating-color';
 
 @Component({
   selector: 'app-profile-page',
@@ -34,6 +35,14 @@ export class ProfilePageComponent {
   readonly stats = signal<RatingStats | null>(null);
   readonly statsLoading = signal(true);
 
+  protected readonly ratingColor = ratingColor;
+
+  /** Plus haute barre de l'histogramme : référence de hauteur pour toutes les autres. */
+  readonly maxRatingCount = computed(() => {
+    const counts = this.stats()?.ratingDistribution.map(bucket => bucket.count) ?? [];
+    return counts.length ? Math.max(...counts) : 0;
+  });
+
   readonly avatarUrl = signal('');
 
   readonly form = this.fb.nonNullable.group({
@@ -54,6 +63,50 @@ export class ProfilePageComponent {
       next: stats => this.stats.set(stats),
       error: () => {}
     });
+  }
+
+  /** Hauteur relative d'une barre de l'histogramme, en pourcentage de la plus haute. */
+  barHeight(count: number): string {
+    const max = this.maxRatingCount();
+    if (max === 0 || count === 0) {
+      return '2px';
+    }
+    return `${Math.max((count / max) * 100, 4)}%`;
+  }
+
+  /** Part d'un groupe dans la barre « sévère / aligné / généreux ». */
+  sharePercent(count: number, total: number): number {
+    return total === 0 ? 0 : (count / total) * 100;
+  }
+
+  /**
+   * Traduit l'écart moyen en une phrase, plus parlante qu'un nombre signé.
+   *
+   * Le verdict se base sur la valeur arrondie, celle qui est affichée : sinon un écart de
+   * -0,27 s'afficherait « -0,3 » tout en étant commenté « dans la moyenne », ce qui donne
+   * l'impression d'une contradiction.
+   */
+  tasteVerdict(rawDelta: number): string {
+    const delta = Math.round(rawDelta * 10) / 10;
+
+    if (delta <= -1) {
+      return 'Tu notes nettement plus sévèrement que le reste du site';
+    }
+    if (delta <= -0.3) {
+      return 'Tu notes un peu plus sévèrement que le reste du site';
+    }
+    if (delta < 0.3) {
+      return 'Tes notes collent de près à la moyenne du site';
+    }
+    if (delta < 1) {
+      return 'Tu notes un peu plus généreusement que le reste du site';
+    }
+    return 'Tu notes nettement plus généreusement que le reste du site';
+  }
+
+  formatDelta(delta: number): string {
+    const rounded = delta.toFixed(1).replace('.', ',');
+    return delta > 0 ? `+${rounded}` : rounded;
   }
 
   startEditing(): void {

@@ -12,4 +12,6 @@ export interface IgdbGame {
   publishers: string[];
   rating: number | null;
   aggregatedRating: number | null;
+  /** Compteur d'attente IGDB : nombre de joueurs suivant le jeu avant sa sortie. */
+  hypes: number | null;
 }

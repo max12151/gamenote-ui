@@ -1,1 +1,86 @@
-/* You can add global styles to this file, and also import other style files */
+/*
+ * Socle global : jetons de design + quelques règles de base.
+ *
+ * Les couleurs, rayons et ombres étaient jusqu'ici recopiés en dur dans chaque feuille de
+ * composant, ce qui rendait impossible d'ajuster l'identité visuelle sans repasser sur
+ * tous les fichiers. Elles sont désormais déclarées ici une fois et référencées partout.
+ */
+:root {
+  /* Violet de marque */
+  --gn-primary: #6d28d9;
+  --gn-primary-deep: #5b21b6;
+  --gn-primary-soft: #ede9fe;
+  --gn-primary-tint: #f5f3ff;
+
+  /* Fonds et surfaces */
+  --gn-bg: #f8fafc;
+  --gn-surface: #ffffff;
+  --gn-surface-alt: #f1f5f9;
+
+  /* Traits */
+  --gn-border: #e2e8f0;
+  --gn-border-strong: #cbd5e1;
+
+  /* Texte, du plus contrasté au plus discret */
+  --gn-ink: #172033;
+  --gn-text: #334155;
+  --gn-text-soft: #475569;
+  --gn-muted: #64748b;
+  --gn-subtle: #94a3b8;
+
+  /* États */
+  --gn-danger: #b91c1c;
+  --gn-danger-soft: #fef2f2;
+  --gn-success: #15803d;
+
+  /* Rayons */
+  --gn-radius-sm: 0.5rem;
+  --gn-radius: 0.8rem;
+  --gn-radius-lg: 1rem;
+  --gn-radius-pill: 99px;
+
+  /* Élévations, de la carte posée à la modal */
+  --gn-shadow-sm: 0 2px 8px #0f172a0a;
+  --gn-shadow: 0 4px 16px #0f172a0f;
+  --gn-shadow-lg: 0 8px 20px #0f172a18;
+  --gn-shadow-xl: 0 20px 60px #0f172a40;
+
+  /* Divers */
+  --gn-focus-ring: 0 0 0 3px #6d28d933;
+  --gn-backdrop: #0f172acc;
+}
+
+body {
+  /* La marge de 8px du navigateur laissait un liseré autour de la barre de navigation,
+     qui est pourtant censée occuper toute la largeur et coller au haut de l'écran. */
+  margin: 0;
+  background: var(--gn-bg);
+  color: var(--gn-text);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.015em;
+}
+
+/* Anneau de focus homogène, visible seulement au clavier. */
+:focus-visible {
+  outline: 2px solid var(--gn-primary);
+  outline-offset: 2px;
+}
+
+/*
+ * Verrouille le défilement de la page tant qu'une modal est ouverte. showModal() rend
+ * bien le reste du document inerte, mais laisse la molette agir dessus : sans ce verrou,
+ * le contenu continue de défiler derrière le fond sombre.
+ *
+ * La règle vise <html>, l'élément qui défile ici. Surtout pas <body> en plus : lui donner
+ * overflow:hidden écrête la hauteur défilable du document, ce qui décale la modal et fait
+ * perdre la position de lecture à la fermeture.
+ */
+html.modal-open {
+  overflow: hidden;
+}
