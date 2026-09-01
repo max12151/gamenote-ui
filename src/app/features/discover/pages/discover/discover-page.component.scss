@@ -1,15 +1,11 @@
+@use 'shared' as *;
+
 :host {
-  display: block;
-  min-height: calc(100vh - 4rem);
-  background: var(--gn-bg);
+  @include page-host;
 }
 
 .page {
-  width: 100%;
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 2rem 1rem 4rem;
-  box-sizing: border-box;
+  @include page-shell(760px);
 }
 
 .header {
@@ -21,10 +17,7 @@
 }
 
 .eyebrow {
-  margin: 0 0 0.5rem;
-  color: var(--gn-primary);
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  @include page-eyebrow;
 }
 
 .header h1 {
@@ -38,32 +31,23 @@
   color: var(--gn-text-soft);
 }
 
-.genre-select {
-  margin-top: 1.25rem;
-  padding: 0.65rem 1rem;
-  border: 1px solid var(--gn-border-strong);
-  border-radius: 0.6rem;
-  background: white;
-  color: var(--gn-ink);
-  font: inherit;
-  min-width: 220px;
-  outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+// Le libellé est déjà porté par le titre de la page : le répéter à l'écran ferait
+// doublon, mais il doit rester lisible par un lecteur d'écran, qui rencontre la
+// liste seule. Il n'était jusqu'ici défini nulle part : le mot « Genre » s'affichait.
+.sr-only {
+  @include visually-hidden;
+}
 
-  &:focus {
-    border-color: var(--gn-primary);
-    box-shadow: var(--gn-focus-ring);
-  }
+// Seule commande de la page : elle mérite d'être plus large que la variante compacte
+// des barres d'outils.
+.genre-select {
+  @include select-field(240px);
+
+  margin-top: 1.25rem;
 }
 
 .state {
-  padding: 3rem;
-  text-align: center;
-  color: var(--gn-muted);
-}
-
-.error {
-  color: var(--gn-danger);
+  @include state-message;
 }
 
 .spotlight {
@@ -72,8 +56,8 @@
   align-items: stretch;
   overflow: hidden;
   border: 1px solid var(--gn-border);
-  border-radius: 1rem;
-  background: white;
+  border-radius: var(--gn-radius-lg);
+  background: var(--gn-surface);
   box-shadow: var(--gn-shadow);
 
   @media (min-width: 560px) {
@@ -132,18 +116,9 @@
 }
 
 .tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin: 0 0 1.5rem;
+  @include tag-list;
 
-  span {
-    padding: 0.25rem 0.6rem;
-    border-radius: 99px;
-    background: var(--gn-primary-soft);
-    color: var(--gn-primary-deep);
-    font-size: 0.82rem;
-  }
+  margin: 0 0 1.5rem;
 }
 
 .note-section {
@@ -152,10 +127,9 @@
 }
 
 .note-label {
+  @include field-label;
+
   margin: 0 0 0.6rem;
-  color: var(--gn-text-soft);
-  font-size: 0.9rem;
-  font-weight: 600;
 }
 
 .confirmation {

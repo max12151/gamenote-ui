@@ -16,6 +16,13 @@ export const routes: Routes = [
     loadComponent: () => import('./features/profile/pages/profile/profile-page.component').then(m => m.ProfilePageComponent)
   },
   {
+    // Profil d'un autre joueur, atteint depuis un avis. Route protégée : lire le
+    // classement du site ne demande pas de compte, consulter la page de quelqu'un, si.
+    path: 'joueurs/:id',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/profile/pages/public-profile/public-profile-page.component').then(m => m.PublicProfilePageComponent)
+  },
+  {
     path: 'collection',
     canActivate: [authGuard],
     loadComponent: () => import('./features/collection/pages/collection/collection-page.component').then(m => m.CollectionPageComponent)

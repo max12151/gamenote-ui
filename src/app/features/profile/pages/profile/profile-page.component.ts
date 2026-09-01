@@ -2,18 +2,19 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../../../core/auth/auth.service';
-import { RatingStats } from '../../../../core/models/rating-stats.model';
+import { RatingStats, TasteComparison } from '../../../../core/models/rating-stats.model';
 import { RatingService } from '../../../../core/rating/rating.service';
 import { AvatarUploadComponent } from '../../../../shared/avatar-upload/avatar-upload.component';
+import { UserAvatarComponent } from '../../../../shared/avatar/user-avatar.component';
 import { ProfileService } from '../../data-access/profile.service';
 import { ratingColor } from '../../../../shared/rating/rating-color';
 
 @Component({
   selector: 'app-profile-page',
-  imports: [ReactiveFormsModule, DatePipe, DecimalPipe, AvatarUploadComponent],
+  imports: [ReactiveFormsModule, DatePipe, DecimalPipe, RouterLink, AvatarUploadComponent, UserAvatarComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './profile-page.component.html',
   styleUrl: './profile-page.component.scss'
@@ -80,14 +81,24 @@ export class ProfilePageComponent {
   }
 
   /**
-   * Traduit l'écart moyen en une phrase, plus parlante qu'un nombre signé.
+   * Traduit la comparaison en une phrase, plus parlante qu'un nombre signé.
    *
-   * Le verdict se base sur la valeur arrondie, celle qui est affichée : sinon un écart de
-   * -0,27 s'afficherait « -0,3 » tout en étant commenté « dans la moyenne », ce qui donne
-   * l'impression d'une contradiction.
+   * L'écart moyen seul ne suffit pas : quelqu'un qui met 1 à la moitié des jeux et 10 à
+   * l'autre moitié affiche un écart quasi nul, alors qu'il n'est jamais d'accord avec
+   * personne. On regarde donc d'abord la part de jeux réellement alignés.
+   *
+   * Le verdict se base ensuite sur l'écart arrondi, celui qui est affiché : sinon un écart
+   * de -0,27 s'afficherait « -0,3 » tout en étant commenté « dans la moyenne ».
    */
-  tasteVerdict(rawDelta: number): string {
-    const delta = Math.round(rawDelta * 10) / 10;
+  tasteVerdict(comparison: TasteComparison): string {
+    const delta = Math.round(comparison.averageDelta * 10) / 10;
+    const alignedShare = comparison.comparedGames === 0
+      ? 0
+      : comparison.aligned / comparison.comparedGames;
+
+    if (alignedShare < 0.25 && Math.abs(delta) < 1) {
+      return 'Tu es rarement d’accord avec le site : tu adores ce qu’il boude, et inversement';
+    }
 
     if (delta <= -1) {
       return 'Tu notes nettement plus sévèrement que le reste du site';
@@ -96,7 +107,7 @@ export class ProfilePageComponent {
       return 'Tu notes un peu plus sévèrement que le reste du site';
     }
     if (delta < 0.3) {
-      return 'Tes notes collent de près à la moyenne du site';
+      return 'Tes notes suivent de près la moyenne du site';
     }
     if (delta < 1) {
       return 'Tu notes un peu plus généreusement que le reste du site';

@@ -1,3 +1,5 @@
+@use 'shared' as *;
+
 :host {
   display: block;
   min-height: 100vh;
@@ -12,11 +14,7 @@
 }
 
 .page {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem 1rem 4rem;
-  box-sizing: border-box;
+  @include page-shell(1200px);
 }
 
 .header {
@@ -28,10 +26,7 @@
 }
 
 .eyebrow {
-  margin: 0 0 0.5rem;
-  color: var(--gn-primary);
-  font-weight: 700;
-  letter-spacing: 0.04em;
+  @include page-eyebrow;
 }
 
 .header h1 {
@@ -59,7 +54,7 @@ input {
   padding: 0.85rem 1rem;
   border: 1px solid var(--gn-border-strong);
   border-radius: 0.6rem;
-  background: white;
+  background: var(--gn-surface);
   color: var(--gn-ink);
   font: inherit;
   outline: none;
@@ -76,7 +71,7 @@ button {
   border-radius: 0.6rem;
   padding: 0.85rem 1.1rem;
   background: var(--gn-primary);
-  color: white;
+  color: var(--gn-on-primary);
   cursor: pointer;
   font: inherit;
   transition: background 0.2s, transform 0.2s;
@@ -102,8 +97,8 @@ button {
 .card {
   overflow: hidden;
   border: 1px solid var(--gn-border);
-  border-radius: 0.8rem;
-  background: white;
+  border-radius: var(--gn-radius);
+  background: var(--gn-surface);
   box-shadow: var(--gn-shadow-sm);
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
@@ -120,11 +115,7 @@ button {
 
   img,
   .placeholder {
-    display: block;
-    width: 100%;
-    aspect-ratio: 3 / 4;
-    object-fit: cover;
-    background: var(--gn-border);
+    @include cover-image;
   }
 }
 
@@ -182,7 +173,7 @@ button {
 
   span {
     padding: 0.25rem 0.5rem;
-    border-radius: 99px;
+    border-radius: var(--gn-radius-pill);
     background: var(--gn-primary-soft);
     color: var(--gn-primary-deep);
     font-size: 0.85rem;
@@ -190,7 +181,7 @@ button {
 }
 
 .rating {
-  color: #b45309;
+  color: var(--gn-amber);
   font-weight: 700;
 }
 
@@ -228,15 +219,7 @@ button {
 }
 
 .sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+  @include visually-hidden;
 }
 
 .footer {
@@ -250,69 +233,27 @@ button {
   text-align: center;
 }
 
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 1.5rem;
-  background: var(--gn-backdrop);
-  z-index: 100;
-  box-sizing: border-box;
+.modal {
+  @include dialog-modal(870px);
 }
 
-.modal {
-  position: relative;
-  width: 100%;
-  max-width: 780px;
-  max-height: 90vh;
-  overflow-y: auto;
-  border-radius: 1rem;
-  background: white;
-  box-shadow: var(--gn-shadow-xl);
-}
+@include dialog-keyframes;
 
 .modal-close {
-  position: sticky;
-  top: 0.75rem;
-  left: 100%;
-  display: grid;
-  place-items: center;
-  width: 2.2rem;
-  height: 2.2rem;
-  padding: 0;
-  margin: 0.75rem 0.75rem -2.2rem auto;
-  border: 0;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--gn-ink) 80%, transparent);
-  color: white;
-  cursor: pointer;
-  font-size: 1.3rem;
-  line-height: 1;
-  z-index: 1;
-
-  &:hover {
-    background: var(--gn-ink);
-  }
+  @include dialog-close;
 }
 
 .modal-body {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
+  @include dialog-body;
 
-  @media (min-width: 640px) {
+  @media (min-width: 700px) {
     flex-direction: row;
-    align-items: flex-start;
   }
 }
 
 .modal-cover {
-  display: block;
-  width: 100%;
-  aspect-ratio: 3 / 4;
-  object-fit: cover;
-  background: var(--gn-border);
+  @include cover-image;
+
   flex-shrink: 0;
 
   @media (min-width: 640px) {
@@ -374,5 +315,38 @@ button {
 
   .grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Bas de modal : passerelle vers les avis de la communaute sur ce jeu. */
+.modal-actions {
+  @include modal-actions;
+}
+
+.see-reviews {
+  @include button-primary;
+
+  ng-icon {
+    font-size: 1.15rem;
+  }
+}
+
+/* Metadonnees en grille, comme dans la Collection : trois paragraphes empiles formaient
+   un pave de texte difficile a balayer. */
+.meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 1rem;
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+
+  dt {
+    color: var(--gn-subtle);
+    font-weight: 600;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--gn-text);
   }
 }

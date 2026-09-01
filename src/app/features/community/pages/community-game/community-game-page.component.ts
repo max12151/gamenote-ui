@@ -16,7 +16,7 @@ import { CommunityGameDetail, GameComment } from '../../models/community.model';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { RatingService } from '../../../../core/rating/rating.service';
 import { NotePickerComponent } from '../../../../shared/rating/note-picker.component';
-import { UserAvatarComponent } from '../../../../shared/avatar/user-avatar.component';
+import { AuthorLinkComponent } from '../../../../shared/author/author-link.component';
 import { ratingColor } from '../../../../shared/rating/rating-color';
 
 const MAX_COMMENT_LENGTH = 2000;
@@ -24,7 +24,7 @@ const MAX_COMMENT_LENGTH = 2000;
 @Component({
   selector: 'app-community-game-page',
   standalone: true,
-  imports: [DatePipe, RouterLink, NgIcon, NotePickerComponent, UserAvatarComponent],
+  imports: [DatePipe, RouterLink, NgIcon, NotePickerComponent, AuthorLinkComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './community-game-page.component.html',
   styleUrl: './community-game-page.component.scss',

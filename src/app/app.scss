@@ -11,7 +11,7 @@
   padding: 0 1.5rem;
   box-sizing: border-box;
   border-bottom: 1px solid var(--gn-border);
-  background: white;
+  background: var(--gn-surface);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -82,15 +82,26 @@
 
 .actions .cta {
   background: var(--gn-primary);
-  color: white;
+  color: var(--gn-on-primary);
 
   &:hover {
     background: var(--gn-primary-deep);
-    color: white;
+    color: var(--gn-on-primary);
   }
 }
 
-@media (max-width: 640px) {
+/*
+ * Bascule en barre d'icônes.
+ *
+ * Le seuil était à 640px, alors que la barre complète — la marque, sept entrées libellées
+ * et le bouton de déconnexion — réclame 975px de contenu. Entre les deux, elle débordait,
+ * et c'est la page entière qui gagnait un défilement horizontal : sur toutes les pages du
+ * site, à la largeur d'un portable ou d'une tablette en paysage.
+ *
+ * 1000px et non 980 : la largeur utile exclut la barre de défilement verticale, une
+ * quinzaine de pixels que le seuil doit prendre en compte.
+ */
+@media (max-width: 1000px) {
   .nav {
     padding: 0 0.75rem;
   }

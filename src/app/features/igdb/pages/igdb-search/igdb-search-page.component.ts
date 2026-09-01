@@ -1,9 +1,21 @@
-import { ChangeDetectionStrategy, Component, HostListener, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  effect,
+  inject,
+  signal,
+  viewChild
+} from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { phosphorImageDuotone, phosphorXDuotone } from '@ng-icons/phosphor-icons/duotone';
+import {
+  phosphorChatsCircleDuotone,
+  phosphorImageDuotone,
+  phosphorXDuotone
+} from '@ng-icons/phosphor-icons/duotone';
 import { phosphorXBold } from '@ng-icons/phosphor-icons/bold';
 import { debounceTime, distinctUntilChanged, filter, finalize, map, switchMap } from 'rxjs';
 import { IgdbApiService } from '../../data-access/igdb-api.service';
@@ -19,7 +31,7 @@ import { NotePickerComponent } from '../../../../shared/rating/note-picker.compo
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './igdb-search-page.component.html',
   styleUrl: './igdb-search-page.component.scss',
-  providers: [provideIcons({ phosphorImageDuotone, phosphorXDuotone, phosphorXBold })]
+  providers: [provideIcons({ phosphorImageDuotone, phosphorXDuotone, phosphorXBold, phosphorChatsCircleDuotone })]
 })
 export class IgdbSearchPageComponent {
   private readonly api = inject(IgdbApiService);
@@ -33,8 +45,36 @@ export class IgdbSearchPageComponent {
   readonly ratings = signal<Map<number, number>>(new Map());
   readonly selectedGame = signal<IgdbGame | null>(null);
 
+  private readonly detailDialog = viewChild<ElementRef<HTMLDialogElement>>('detailDialog');
+
 
   constructor() {
+    // Le <dialog> natif se pilote par methodes imperatives : on le synchronise sur le
+    // signal, qui reste la source de verite pour le template.
+    effect(onCleanup => {
+      const dialog = this.detailDialog()?.nativeElement;
+
+      if (!dialog) {
+        return;
+      }
+
+      const open = this.selectedGame() !== null;
+
+      if (open && !dialog.open) {
+        // showModal() donne le focus au dialog et fait defiler le document jusqu'a lui :
+        // sans cette restauration, ouvrir une fiche depuis le bas des resultats renvoie
+        // en haut de liste et decale la modal hors de l'ecran.
+        const scrollY = window.scrollY;
+        dialog.showModal();
+        window.scrollTo({ top: scrollY, behavior: 'instant' });
+      } else if (!open && dialog.open) {
+        dialog.close();
+      }
+
+      document.documentElement.classList.toggle('modal-open', open);
+      onCleanup(() => document.documentElement.classList.remove('modal-open'));
+    });
+
     if (this.auth.isAuthenticated()) {
       this.ratingService.getCollection().subscribe(collection => {
         this.ratings.set(new Map(collection.map(r => [r.igdbGameId, r.rating])));
@@ -98,12 +138,19 @@ export class IgdbSearchPageComponent {
     this.selectedGame.set(game);
   }
 
+  /**
+   * Appelee par le bouton, le clic sur le fond, Echap et l'evenement natif `close`.
+   * Idempotente : ces chemins peuvent se declencher ensemble. Echap est intercepte en
+   * plus de `(close)`, certains moteurs ne dispatchant pas cet evenement.
+   */
   closeModal(): void {
     this.selectedGame.set(null);
   }
 
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
-    this.closeModal();
+  /** Le contenu remplit la boite : un clic visant le <dialog> vient donc du ::backdrop. */
+  onBackdropClick(event: MouseEvent): void {
+    if (event.target === this.detailDialog()?.nativeElement) {
+      this.closeModal();
+    }
   }
 }

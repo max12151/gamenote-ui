@@ -1,0 +1,684 @@
+////
+/// Motifs partagés entre les pages.
+///
+/// Les mêmes blocs — coquille de page, en-tête, messages d'état, boutons, cartes, modal —
+/// étaient recopiés à l'identique dans sept feuilles de composant. Toute retouche imposait
+/// de repasser sur chacune, avec le risque qu'une seule soit oubliée et dérive.
+///
+/// Ce fichier ne produit aucun CSS tant qu'il n'est pas utilisé : ce sont des mixins, pas
+/// des règles. Chaque composant reste maître de ses sélecteurs et n'inclut que ce dont il
+/// a besoin, ce qui évite les styles globaux qui fuient d'une page à l'autre.
+///
+/// Utilisation : `@use 'shared' as *;` (le dossier src/styles est dans includePaths).
+////
+
+/// Fond pleine hauteur d'une page, sous la barre de navigation de 4rem.
+@mixin page-host {
+  display: block;
+  min-height: calc(100vh - 4rem);
+  background: var(--gn-bg);
+}
+
+/// Colonne centrée d'une page.
+@mixin page-shell($max-width: 1100px) {
+  width: 100%;
+  max-width: $max-width;
+  margin: 0 auto;
+  padding: 2rem 1rem 4rem;
+  box-sizing: border-box;
+}
+
+/// En-tête centré : sur-titre violet, titre, phrase d'introduction.
+/// Attend la structure `.header > .eyebrow + h1 + p`.
+@mixin page-header($intro-width: 620px) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 2rem;
+  text-align: center;
+
+  .eyebrow {
+    margin: 0 0 0.5rem;
+    color: var(--gn-primary);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  h1 {
+    margin: 0;
+    color: var(--gn-ink);
+  }
+
+  p:not(.eyebrow) {
+    max-width: $intro-width;
+    margin: 0.75rem 0 0;
+    color: var(--gn-text-soft);
+  }
+}
+
+/// Sur-titre violet, pour les pages dont l'en-tête ne suit pas la structure de
+/// `page-header` mais qui gardent la même accroche.
+@mixin page-eyebrow {
+  margin: 0 0 0.5rem;
+  color: var(--gn-primary);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/// Message centré occupant la zone de contenu : chargement, liste vide, erreur.
+@mixin state-message {
+  padding: 3rem;
+  text-align: center;
+  color: var(--gn-muted);
+
+  a {
+    color: var(--gn-primary);
+    font-weight: 600;
+  }
+
+  &.error {
+    color: var(--gn-danger);
+  }
+}
+
+/// Base commune aux boutons du site : la variante colore, elle ne repositionne rien.
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-radius: 0.6rem;
+  padding: 0.55rem 1rem;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+/// Bouton d'action principale, violet plein.
+@mixin button-primary {
+  @include button-base;
+
+  border: 1px solid transparent;
+  background: var(--gn-primary);
+  color: var(--gn-on-primary);
+
+  &:hover:not(:disabled) {
+    background: var(--gn-primary-deep);
+  }
+}
+
+/// Bouton secondaire, contour discret sur fond blanc.
+@mixin button-ghost {
+  @include button-base;
+
+  border: 1px solid var(--gn-border-strong);
+  background: var(--gn-surface);
+  color: var(--gn-text-soft);
+
+  &:hover:not(:disabled) {
+    background: var(--gn-surface-alt);
+  }
+}
+
+/// Carte posée sur le fond de page, avec réaction au survol si `$hover` est vrai.
+@mixin surface-card($hover: true) {
+  border: 1px solid var(--gn-border);
+  border-radius: var(--gn-radius);
+  background: var(--gn-surface);
+  box-shadow: var(--gn-shadow-sm);
+
+  @if $hover {
+    transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+
+    &:hover {
+      border-color: var(--gn-primary-soft);
+      box-shadow: var(--gn-shadow-lg);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+/// Étiquettes de genre, en gélules violettes.
+@mixin tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+
+  span {
+    padding: 0.25rem 0.6rem;
+    border-radius: var(--gn-radius-pill);
+    background: var(--gn-primary-soft);
+    color: var(--gn-primary-deep);
+    font-size: 0.82rem;
+  }
+}
+
+/// Contenu réservé aux lecteurs d'écran.
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+///
+/// Modal reposant sur l'élément <dialog> natif : le ::backdrop, le piège à focus, la
+/// fermeture par Échap et l'inertie de la page sont fournis par le navigateur.
+///
+/// Deux pièges, tous deux rencontrés puis corrigés, sont figés ici pour de bon :
+///   - ne jamais poser de `position` : la feuille du navigateur applique déjà
+///     `position: fixed` sur `dialog:modal`, et l'écraser (même par `relative`) remet la
+///     modal dans le flux du document, où elle défile avec la page et sort de l'écran ;
+///   - `inset: 0` + `margin: auto` centrent exactement, sans dépendre des marges par
+///     défaut appliquées à <dialog>.
+///
+@mixin dialog-modal($width: 870px, $max-height: 780px) {
+  display: none;
+  inset: 0;
+  margin: auto;
+  width: min(100% - 3rem, #{$width});
+  max-width: none;
+  max-height: min(95vh, #{$max-height});
+  padding: 0;
+  border: 0;
+  border-radius: 16px;
+  background: var(--gn-surface);
+  color: inherit;
+  box-shadow: var(--gn-shadow-xl);
+
+  // Le radius découpe le contenu, scrollbar du corps comprise.
+  overflow: hidden;
+
+  &[open] {
+    display: flex;
+    flex-direction: column;
+    animation: gn-modal-in 0.18s ease-out;
+  }
+
+  &::backdrop {
+    background: var(--gn-backdrop);
+  }
+
+  &[open]::backdrop {
+    animation: gn-backdrop-in 0.18s ease-out;
+  }
+}
+
+/// Corps défilant d'une modal. Seul lui défile : la boîte, elle, reste fixe, sinon la
+/// barre de défilement traverse toute la modal et écrase les coins arrondis.
+@mixin dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  overflow-y: auto;
+
+  // Arrivé en bout de course, le défilement ne se propage plus à la page derrière.
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gn-border-strong) transparent;
+}
+
+/// Pastille de fermeture, flottant au-dessus du coin haut-droit de la modal.
+@mixin dialog-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--gn-ink) 80%, transparent);
+  color: var(--gn-on-primary);
+  cursor: pointer;
+  font-size: 1.3rem;
+  line-height: 1;
+  z-index: 2;
+  backdrop-filter: blur(4px);
+  transition: background 0.15s;
+
+  &:hover {
+    background: var(--gn-ink);
+  }
+}
+
+/// Animations de la modal. À appeler une fois par feuille utilisant `dialog-modal`,
+/// les keyframes étant portées par le composant.
+@mixin dialog-keyframes {
+  @keyframes gn-modal-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+    }
+  }
+
+  @keyframes gn-backdrop-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    dialog[open],
+    dialog[open]::backdrop {
+      animation: none;
+    }
+  }
+}
+
+/// Lien écrit au fil du texte : violet, souligné seulement au survol. À réserver aux
+/// liens qui sont vraiment un mot dans une phrase — une carte entière qui mène quelque
+/// part se signale par son relief, pas par un soulignement qui barrerait son contenu.
+@mixin text-link {
+  color: var(--gn-primary);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+/// Libellé de champ ou d'un petit bloc de formulaire.
+@mixin field-label {
+  color: var(--gn-text-soft);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+/// Champ de saisie du site : bordure discrète, anneau violet au focus.
+@mixin text-field {
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--gn-border-strong);
+  border-radius: 0.6rem;
+  background: var(--gn-surface);
+  color: var(--gn-ink);
+  font: inherit;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+
+  &:focus {
+    border-color: var(--gn-primary);
+    box-shadow: var(--gn-focus-ring);
+  }
+}
+
+///
+/// Liste déroulante du site.
+///
+/// À poser sur un conteneur enveloppant le <select>, jamais sur le <select> lui-même :
+/// un élément remplacé n'affiche pas de ::before / ::after, donc le chevron ne peut pas
+/// être dessiné sur le champ. L'enveloppe le permet, et le chevron devient alors un
+/// simple carré de deux bordures pivoté à 45° — il suit les jetons de couleur, réagit au
+/// survol, et remplace le SVG encodé en data-URI dont la couleur, elle, était figée en
+/// noir (une image de fond est un document isolé : `currentColor` n'y remonte pas).
+///
+/// `$compact` donne la variante des barres d'outils, plus basse et plus petite que celle
+/// posée seule sous un titre.
+///
+@mixin select-field($min-width: 220px, $compact: false) {
+  position: relative;
+  display: inline-flex;
+  min-width: $min-width;
+  max-width: 100%;
+
+  select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    flex: 1;
+    min-width: 0;
+    border: 1px solid var(--gn-border-strong);
+    border-radius: 0.6rem;
+    background: var(--gn-surface);
+    color: var(--gn-ink);
+    font: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    outline: none;
+    box-shadow: var(--gn-shadow-sm);
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+
+    // Marges logiques : en écriture de droite à gauche, la réserve pour le chevron
+    // passe d'elle-même de l'autre côté, comme le chevron lui-même.
+    @if $compact {
+      padding: 0.45rem 0.9rem;
+      padding-inline-end: 2.1rem;
+      font-size: 0.85rem;
+    } @else {
+      padding: 0.7rem 1.1rem;
+      padding-inline-end: 2.5rem;
+    }
+
+    &::-ms-expand {
+      display: none;
+    }
+
+    &:hover:not(:disabled) {
+      border-color: var(--gn-primary);
+      background: var(--gn-primary-tint);
+    }
+
+    &:focus-visible {
+      border-color: var(--gn-primary);
+      box-shadow: var(--gn-focus-ring);
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      background: var(--gn-surface-alt);
+      box-shadow: none;
+    }
+
+    // Le menu natif reste rendu par le système : on ne peut lui donner que ces deux-là.
+    option {
+      background: var(--gn-surface);
+      color: var(--gn-ink);
+      font-weight: 400;
+    }
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    inset-inline-end: if($compact, 0.85rem, 1rem);
+    width: 0.45rem;
+    height: 0.45rem;
+    border-right: 2px solid var(--gn-muted);
+    border-bottom: 2px solid var(--gn-muted);
+    border-end-end-radius: 1px;
+
+    // -70% et non -50% : la diagonale déporte le centre visuel du chevron vers le bas.
+    transform: translateY(-70%) rotate(45deg);
+
+    // Sans quoi le chevron avalerait le clic destiné à ouvrir la liste.
+    pointer-events: none;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+
+  &:hover::after,
+  &:focus-within::after {
+    border-color: var(--gn-primary);
+  }
+
+  ///
+  /// Navigateurs qui savent styler la liste elle-même (Chrome / Edge 135+).
+  ///
+  /// Le panneau déroulant cesse d'être dessiné par le système : il devient un élément
+  /// de la page comme un autre, et reçoit les surfaces, les rayons et le violet du site.
+  /// Là où ce n'est pas supporté, la liste garde le menu natif — seul le champ, lui,
+  /// est identique partout.
+  ///
+  @supports (appearance: base-select) {
+    // Le chevron dessiné plus haut est conservé, et celui du navigateur — un triangle
+    // plein, d'un autre poids et d'une autre couleur — est retiré : la liste doit avoir
+    // la même allure ici que là où `base-select` n'existe pas.
+    select::picker-icon {
+      display: none;
+    }
+
+    // Seul cet état renseigne que la liste est dépliée ; ailleurs, le chevron ne pivote
+    // pas plutôt que de rester retourné après la fermeture, comme le ferait `:focus`.
+    &:has(select:open)::after {
+      border-color: var(--gn-primary);
+      transform: translateY(-30%) rotate(225deg);
+    }
+
+    select {
+      appearance: base-select;
+
+      &:open {
+        border-color: var(--gn-primary);
+        box-shadow: var(--gn-focus-ring);
+      }
+
+      &::picker(select) {
+        appearance: base-select;
+        padding: 0.35rem;
+        margin-top: 0.4rem;
+        border: 1px solid var(--gn-border-strong);
+        border-radius: 0.6rem;
+        background: var(--gn-surface);
+        box-shadow: var(--gn-shadow-lg);
+        max-height: 20rem;
+        overflow-y: auto;
+
+        opacity: 0;
+        transform: translateY(-4px) scale(0.98);
+        transition:
+          opacity 0.15s,
+          transform 0.15s,
+          display 0.15s allow-discrete,
+          overlay 0.15s allow-discrete;
+
+        &:popover-open {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+
+        @starting-style {
+          opacity: 0;
+          transform: translateY(-4px) scale(0.98);
+        }
+      }
+
+      option {
+        padding: 0.5rem 0.7rem;
+        border-radius: 0.4rem;
+        cursor: pointer;
+        transition: background 0.12s, color 0.12s;
+
+        &:hover,
+        &:focus {
+          background: var(--gn-primary-soft);
+          color: var(--gn-primary-deep);
+        }
+
+        &:checked {
+          background: var(--gn-primary);
+          color: var(--gn-on-primary);
+          font-weight: 600;
+        }
+
+        &::checkmark {
+          color: inherit;
+          margin-inline-end: 0.4rem;
+        }
+      }
+    }
+  }
+}
+
+///
+/// Jauge horizontale : histogramme des notes, répartition par genre, part des avis
+/// alignés. Trois pages dessinaient le même rail et le même remplissage, à un demi-pixel
+/// de hauteur près.
+///
+/// Le rail porte `overflow: hidden` : sans lui, un remplissage à 2 % dépasse ses propres
+/// coins arrondis et déborde du rail.
+///
+@mixin meter-track($height: 0.6rem, $background: var(--gn-surface-alt)) {
+  height: $height;
+  overflow: hidden;
+  border-radius: var(--gn-radius-pill);
+  background: $background;
+}
+
+/// Remplissage d'une jauge : la couleur reste à la charge de l'appelant, elle porte
+/// souvent un sens (sévère, généreux, part d'un genre).
+@mixin meter-fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--gn-radius-pill);
+  transition: width 0.3s;
+}
+
+/// Jaquette au ratio des boîtes de jeu, avec fond de repli pendant le chargement.
+@mixin cover-image {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  background: var(--gn-border);
+}
+
+/// Vignette de jaquette dans une ligne de carte : trop petite pour qu'on la regarde,
+/// assez grande pour reconnaître un jeu déjà vu.
+@mixin thumb-cover($width: 1.9rem, $radius: 0.25rem) {
+  width: $width;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: $radius;
+  background: var(--gn-border);
+}
+
+/// Colonne « titre + précision discrète » d'une ligne de carte. `min-width: 0` est ce qui
+/// rend la troncature possible : sans lui, un titre long pousse la carte au lieu de se
+/// laisser couper.
+@mixin card-lines($gap: 0.15rem) {
+  display: flex;
+  flex-direction: column;
+  gap: $gap;
+  min-width: 0;
+}
+
+/// Corps d'un avis écrit par un joueur : ses retours à la ligne sont conservés, et un mot
+/// interminable est coupé plutôt que de déborder de la carte.
+@mixin comment-text {
+  margin: 0;
+  color: var(--gn-text);
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/// Remplacement d'une jaquette absente : icône centrée sur un aplat neutre.
+@mixin cover-placeholder {
+  display: grid;
+  place-items: center;
+  color: var(--gn-subtle);
+  background: var(--gn-surface-alt);
+}
+
+/// Barre d'actions en bas d'une modal, séparée du contenu par un filet.
+@mixin modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--gn-border);
+}
+
+///
+/// Formulaire d'authentification : carte centrée sur la page.
+///
+/// Connexion et inscription partageaient une centaine de lignes identiques à la largeur
+/// de carte près. Les faire diverger par accident était une question de temps.
+///
+@mixin auth-form($card-width: 400px) {
+  :host {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(100vh - 4rem);
+    padding: 2rem 1rem;
+    box-sizing: border-box;
+    background: var(--gn-bg);
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: $card-width;
+    padding: 2rem;
+    border: 1px solid var(--gn-border);
+    border-radius: var(--gn-radius);
+    background: var(--gn-surface);
+    box-shadow: var(--gn-shadow-sm);
+    box-sizing: border-box;
+  }
+
+  .eyebrow {
+    @include page-eyebrow;
+
+    margin-bottom: 0.25rem;
+  }
+
+  h1 {
+    margin: 0 0 1.5rem;
+    color: var(--gn-ink);
+  }
+
+  label {
+    @include field-label;
+
+    margin-bottom: 0.35rem;
+  }
+
+  input,
+  textarea {
+    @include text-field;
+
+    margin-bottom: 1.1rem;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  button {
+    @include button-primary;
+
+    padding: 0.85rem 1.1rem;
+    font-size: 1rem;
+  }
+
+  .state {
+    margin: -0.5rem 0 1rem;
+    font-size: 0.9rem;
+
+    &.error {
+      color: var(--gn-danger);
+    }
+  }
+
+  .hint {
+    margin: -0.5rem 0 1.1rem;
+    color: var(--gn-subtle);
+    font-size: 0.82rem;
+  }
+
+  .switch {
+    margin: 1.25rem 0 0;
+    color: var(--gn-muted);
+    font-size: 0.9rem;
+    text-align: center;
+
+    a {
+      color: var(--gn-primary);
+      font-weight: 600;
+    }
+  }
+}

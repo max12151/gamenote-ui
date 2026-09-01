@@ -58,3 +58,24 @@ export interface CommunityGameDetail {
   myRating: number | null;
   myComment: GameComment | null;
 }
+
+/**
+ * Commentaire présenté hors de la fiche de son jeu : flux des derniers avis de l'accueil,
+ * ou avis récents d'un joueur sur son profil.
+ *
+ * Le jeu n'est plus le contexte mais une information à montrer, d'où son titre et sa
+ * jaquette. À l'inverse, `mine` et `canDelete` disparaissent : on ne modère pas depuis un
+ * flux, on y clique pour rejoindre la fiche, seul endroit qui connaisse ces droits.
+ */
+export interface RecentComment {
+  id: number;
+  igdbGameId: number;
+  gameTitle: string;
+  gameCoverUrl: string | null;
+  content: string;
+  createdAt: string;
+  authorId: number;
+  authorUsername: string;
+  authorHasAvatar: boolean;
+  authorRating: number | null;
+}

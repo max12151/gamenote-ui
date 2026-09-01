@@ -10,17 +10,18 @@
     >
       Genre
     </label>
-    <select
-      id="genre-select"
-      class="genre-select"
-      [value]="selectedGenre()"
-      (change)="onGenreChange($any($event.target).value)"
-    >
-      <option value="">Tous les genres</option>
-      @for (genre of genres; track genre) {
-        <option [value]="genre">{{ genre }}</option>
-      }
-    </select>
+    <span class="genre-select">
+      <select
+        id="genre-select"
+        [value]="selectedGenre()"
+        (change)="onGenreChange($any($event.target).value)"
+      >
+        <option value="">Tous les genres</option>
+        @for (genre of genres; track genre) {
+          <option [value]="genre">{{ genre }}</option>
+        }
+      </select>
+    </span>
   </header>
 
   @if (error()) {

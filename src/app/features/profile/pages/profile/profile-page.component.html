@@ -6,21 +6,23 @@
   } @else if (user(); as user) {
     <div class="card">
       <div class="header">
-        @if (user.avatarUrl) {
-          <img
-            [src]="user.avatarUrl"
-            [alt]="'Avatar de ' + user.username"
-          />
-        } @else {
-          <div class="placeholder">
-            {{ user.username.charAt(0).toUpperCase() }}
-          </div>
-        }
+        <app-user-avatar
+          class="portrait"
+          [userId]="user.id"
+          [username]="user.username"
+          [imageUrl]="user.avatarUrl"
+        />
 
         <div class="identity">
           <h1>{{ user.username }}</h1>
           <p class="muted">{{ user.email }}</p>
           <p class="muted small">Membre depuis {{ user.createdAt | date: 'longDate' }}</p>
+          <a
+            class="public-link"
+            [routerLink]="['/joueurs', user.id]"
+          >
+            Voir mon profil tel que les autres le voient
+          </a>
         </div>
 
         <button
@@ -155,7 +157,7 @@
                     <span class="delta-unit">point d'écart moyen</span>
                   </div>
 
-                  <p class="verdict">{{ tasteVerdict(s.tasteComparison.averageDelta) }}</p>
+                  <p class="verdict">{{ tasteVerdict(s.tasteComparison) }}</p>
                 </div>
 
                 <div

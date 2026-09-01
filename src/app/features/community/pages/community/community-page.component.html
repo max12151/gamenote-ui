@@ -6,6 +6,37 @@
       La moyenne des notes de tous les joueurs du site, du mieux noté au moins bien noté.
       Ouvre un jeu pour voir le détail des notes et lire les avis.
     </p>
+
+    <div class="search">
+      <ng-icon
+        name="phosphorMagnifyingGlassDuotone"
+        size="1.2rem"
+      />
+
+      <label
+        class="sr-only"
+        for="community-search"
+      >
+        Rechercher un jeu dans le classement
+      </label>
+      <input
+        id="community-search"
+        type="search"
+        placeholder="Rechercher un jeu du classement…"
+        autocomplete="off"
+        [formControl]="search"
+      />
+
+      @if (isSearching()) {
+        <button
+          type="button"
+          class="clear"
+          (click)="clearSearch()"
+        >
+          Effacer
+        </button>
+      }
+    </div>
   </header>
 
   @if (error()) {
@@ -16,15 +47,25 @@
 
   @if (loading()) {
     <p class="state">
-      Calcul des moyennes…
+      {{ isSearching() ? 'Recherche…' : 'Calcul des moyennes…' }}
     </p>
   } @else if (games().length === 0 && !error()) {
-    <p class="state">
-      Aucun jeu n'a encore été noté sur le site. Sois le premier !
-    </p>
+    @if (isSearching()) {
+      <p class="state">
+        Aucun jeu noté ne correspond à cette recherche.
+      </p>
+    } @else {
+      <p class="state">
+        Aucun jeu n'a encore été noté sur le site. Sois le premier !
+      </p>
+    }
   } @else {
     <p class="total">
-      {{ totalGames() }} jeu{{ totalGames() > 1 ? 'x' : '' }} noté{{ totalGames() > 1 ? 's' : '' }} par la communauté
+      @if (isSearching()) {
+        {{ totalGames() }} résultat{{ totalGames() > 1 ? 's' : '' }}
+      } @else {
+        {{ totalGames() }} jeu{{ totalGames() > 1 ? 'x' : '' }} noté{{ totalGames() > 1 ? 's' : '' }} par la communauté
+      }
     </p>
 
     <ol
@@ -50,7 +91,7 @@
               <img
                 class="cover"
                 [src]="game.coverUrl"
-                [alt]="'Cover de ' + game.title"
+                [alt]="'Cover de '"
                 loading="lazy"
               />
             } @else {

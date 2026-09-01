@@ -119,18 +119,19 @@
   </footer>
 </div>
 
-@if (selectedGame(); as game) {
-  <div
-    class="modal-backdrop"
-    (click)="closeModal()"
-  >
-    <div
-      class="modal"
-      role="dialog"
-      aria-modal="true"
-      [attr.aria-label]="game.title"
-      (click)="$event.stopPropagation()"
-    >
+<!--
+  Meme mecanique que la modal de la Collection : <dialog> ouvert par showModal(), qui
+  fournit le ::backdrop, le piege a focus, la fermeture par Echap et l'inertie de la page.
+-->
+<dialog
+  #detailDialog
+  class="modal"
+  [attr.aria-label]="selectedGame()?.title"
+  (keydown.escape)="closeModal()"
+  (close)="closeModal()"
+  (click)="onBackdropClick($event)"
+>
+  @if (selectedGame(); as game) {
       <button
         type="button"
         class="modal-close"
@@ -174,26 +175,22 @@
             {{ game.summary || 'Aucune description disponible.' }}
           </p>
 
-          @if (game.developers.length) {
-            <p>
-              <strong>Développeur :</strong>
-              {{ game.developers.join(', ') }}
-            </p>
-          }
+          <dl class="meta">
+            @if (game.developers.length) {
+              <dt>Développeur</dt>
+              <dd>{{ game.developers.join(', ') }}</dd>
+            }
 
-          @if (game.publishers.length) {
-            <p>
-              <strong>Éditeur :</strong>
-              {{ game.publishers.join(', ') }}
-            </p>
-          }
+            @if (game.publishers.length) {
+              <dt>Éditeur</dt>
+              <dd>{{ game.publishers.join(', ') }}</dd>
+            }
 
-          @if (game.platforms.length) {
-            <p>
-              <strong>Plateformes :</strong>
-              {{ game.platforms.join(', ') }}
-            </p>
-          }
+            @if (game.platforms.length) {
+              <dt>Plateformes</dt>
+              <dd>{{ game.platforms.join(', ') }}</dd>
+            }
+          </dl>
 
           @if (game.genres.length) {
             <div class="tags">
@@ -225,8 +222,17 @@
               </p>
             }
           </div>
+
+          <div class="modal-actions">
+            <a
+              class="see-reviews"
+              [routerLink]="['/avis', game.igdbId]"
+            >
+              <ng-icon name="phosphorChatsCircleDuotone" />
+              Voir les avis des joueurs
+            </a>
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-}
+    }
+</dialog>

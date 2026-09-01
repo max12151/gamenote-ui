@@ -1,0 +1,212 @@
+<div class="page">
+  <a
+    class="back"
+    routerLink="/avis"
+  >
+    <ng-icon name="phosphorArrowLeftDuotone" />
+    Retour aux avis
+  </a>
+
+  @if (loading()) {
+    <p class="state">Chargement du profil…</p>
+  } @else if (notFound()) {
+    <p class="state error">Ce joueur n'existe pas ou n'est plus inscrit.</p>
+  } @else if (profile(); as player) {
+    <header class="identity">
+      <app-user-avatar
+        class="portrait"
+        [userId]="player.id"
+        [username]="player.username"
+        [hasAvatar]="player.hasAvatar"
+      />
+
+      <div class="identity-body">
+        <h1>
+          {{ player.username }}
+
+          @if (player.role === 'ADMIN') {
+            <span class="badge">Admin</span>
+          }
+        </h1>
+
+        <p class="since">
+          Membre depuis {{ player.createdAt | date: 'MMMM y' }}
+        </p>
+
+        @if (player.bio) {
+          <p class="bio">{{ player.bio }}</p>
+        }
+
+        @if (isMe()) {
+          <a
+            class="own"
+            routerLink="/profil"
+          >
+            C'est toi — modifier ton profil
+          </a>
+        }
+      </div>
+    </header>
+
+    <section
+      class="stats"
+      aria-label="Statistiques de notation"
+    >
+      <div class="stat games">
+        <ng-icon name="phosphorGameControllerDuotone" />
+        <span class="value">{{ player.ratedGames }}</span>
+        <span class="label">jeu{{ player.ratedGames > 1 ? 'x' : '' }} noté{{ player.ratedGames > 1 ? 's' : '' }}</span>
+      </div>
+
+      <div class="stat average">
+        <ng-icon name="phosphorChartBarDuotone" />
+        <span
+          class="value"
+          [style.color]="player.averageRating ? ratingColor(player.averageRating) : null"
+        >
+          {{ player.averageRating ? (player.averageRating | number: '1.1-1') : '—' }}
+        </span>
+        <span class="label">note moyenne donnée</span>
+      </div>
+
+      <div class="stat genre">
+        <ng-icon name="phosphorTrophyDuotone" />
+        <span class="value small">{{ player.topGenre ?? '—' }}</span>
+        <span class="label">
+          @if (player.topGenre) {
+            genre préféré · {{ player.topGenreCount }} jeu{{ player.topGenreCount > 1 ? 'x' : '' }}
+          } @else {
+            genre préféré
+          }
+        </span>
+      </div>
+    </section>
+
+    @if (player.bestRatedGame; as best) {
+      <section
+        class="favourite"
+        aria-label="Son jeu préféré"
+      >
+        <h2>Son coup de cœur</h2>
+
+        <a
+          class="favourite-card"
+          [routerLink]="['/avis', best.igdbGameId]"
+        >
+          @if (best.coverUrl) {
+            <img
+              [src]="best.coverUrl"
+              [alt]="'Jaquette de '"
+              loading="lazy"
+            />
+          } @else {
+            <span class="cover placeholder">
+              <ng-icon
+                name="phosphorImageDuotone"
+                size="1.5rem"
+              />
+            </span>
+          }
+
+          <span class="favourite-body">
+            <span class="game-title">{{ best.title }}</span>
+            @if (best.genres.length > 0) {
+              <span class="muted">{{ best.genres.slice(0, 3).join(' · ') }}</span>
+            }
+          </span>
+
+          <span
+            class="note"
+            [style.color]="ratingColor(best.rating)"
+          >
+            {{ best.rating }}<small>/10</small>
+          </span>
+        </a>
+      </section>
+    }
+
+    @if (player.genreBreakdown.length > 0) {
+      <section
+        class="genres"
+        aria-label="Répartition par genre"
+      >
+        <h2>Ce qu'il joue</h2>
+
+        <ul class="genre-list">
+          @for (genre of player.genreBreakdown; track genre.genre) {
+            <li>
+              <span class="genre-name">{{ genre.genre }}</span>
+              <span class="genre-track">
+                <span
+                  class="genre-bar"
+                  [style.width]="barWidth(genre.count)"
+                ></span>
+              </span>
+              <span class="genre-count">{{ genre.count }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    <section
+      class="reviews"
+      aria-label="Ses derniers avis"
+    >
+      <h2>
+        <ng-icon name="phosphorChatsCircleDuotone" />
+        Ses derniers avis
+      </h2>
+
+      @if (player.recentComments.length === 0) {
+        <p class="state">Ce joueur n'a encore commenté aucun jeu.</p>
+      } @else {
+        <ul class="review-list">
+          @for (review of player.recentComments; track review.id) {
+            <li class="review">
+              <a
+                class="review-game"
+                [routerLink]="['/avis', review.igdbGameId]"
+              >
+                @if (review.gameCoverUrl) {
+                  <img
+                    [src]="review.gameCoverUrl"
+                    [alt]="'Jaquette de '"
+                    loading="lazy"
+                  />
+                } @else {
+                  <span class="cover placeholder">
+                    <ng-icon
+                      name="phosphorImageDuotone"
+                      size="1.1rem"
+                    />
+                  </span>
+                }
+
+                <span class="game-title">{{ review.gameTitle }}</span>
+
+                @if (review.authorRating !== null) {
+                  <span
+                    class="note"
+                    [style.color]="ratingColor(review.authorRating)"
+                  >
+                    {{ review.authorRating }}<small>/10</small>
+                  </span>
+                }
+              </a>
+
+              <p class="review-body">{{ review.content }}</p>
+
+              <time
+                class="date"
+                [attr.datetime]="review.createdAt"
+              >
+                {{ review.createdAt | date: 'longDate' }}
+              </time>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
+</div>

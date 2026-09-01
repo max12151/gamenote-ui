@@ -1,111 +1,86 @@
+@use 'shared' as *;
+
 :host {
-  display: block;
-  min-height: calc(100vh - 4rem);
-  background: var(--gn-bg);
+  @include page-host;
 }
 
 .page {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem 1rem 4rem;
-  box-sizing: border-box;
+  @include page-shell(1200px);
 }
 
 .header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  @include page-header(650px);
+
   margin-bottom: 2.5rem;
-  text-align: center;
-}
-
-.eyebrow {
-  margin: 0 0 0.5rem;
-  color: var(--gn-primary);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-}
-
-.header h1 {
-  margin: 0;
-  color: var(--gn-ink);
-}
-
-.header p:not(.eyebrow) {
-  max-width: 650px;
-  margin: 0.75rem 0 0;
-  color: var(--gn-text-soft);
 }
 
 .state {
-  padding: 3rem;
-  text-align: center;
-  color: var(--gn-muted);
-
-  a {
-    color: var(--gn-primary);
-    font-weight: 600;
-  }
+  @include state-message;
 }
 
-.error {
-  color: var(--gn-danger);
-}
-
+/*
+ * Barre d'outils : deux listes déroulantes et un inverseur de sens, réunis sur une
+ * carte qui les détache de la grille de jeux au lieu de les poser à même le fond.
+ */
 .toolbar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   margin-bottom: 1.5rem;
-  padding: 0.9rem 1.1rem;
+  padding: 0.75rem 1rem;
   border: 1px solid var(--gn-border);
-  border-radius: 0.7rem;
-  background: white;
-
-  label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--gn-text-soft);
-    font-size: 0.85rem;
-    font-weight: 600;
-  }
-
-  select {
-    padding: 0.4rem 0.6rem;
-    border: 1px solid var(--gn-border-strong);
-    border-radius: 0.5rem;
-    background: white;
-    color: var(--gn-ink);
-    font: inherit;
-    font-size: 0.85rem;
-    outline: none;
-
-    &:focus {
-      border-color: var(--gn-primary);
-      box-shadow: var(--gn-focus-ring);
-    }
-  }
+  border-radius: var(--gn-radius);
+  background: var(--gn-surface);
+  box-shadow: var(--gn-shadow-sm);
 }
 
+.field {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.field-name {
+  @include field-label;
+
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.select {
+  @include select-field($min-width: 9.5rem, $compact: true);
+}
+
+// Même habillage et même hauteur que la liste de tri qu'il suit : il se lit comme le
+// prolongement du critère, et non comme une action indépendante.
 .sort-dir {
-  display: grid;
-  place-items: center;
-  width: 2rem;
-  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.2rem;
+  padding: 0.45rem 0.55rem;
   border: 1px solid var(--gn-border-strong);
-  border-radius: 0.5rem;
-  background: white;
+  border-radius: 0.6rem;
+  background: var(--gn-surface);
   color: var(--gn-text-soft);
+  box-shadow: var(--gn-shadow-sm);
   cursor: pointer;
-  font-size: 1rem;
-  font-weight: 700;
-  transition: background 0.15s;
+  font: inherit;
+  font-size: 0.95rem;
+  line-height: 1.15;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
 
   &:hover {
-    background: var(--gn-surface-alt);
+    border-color: var(--gn-primary);
+    background: var(--gn-primary-tint);
+    color: var(--gn-primary);
+  }
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--gn-primary);
+    box-shadow: var(--gn-focus-ring);
   }
 }
 
@@ -124,8 +99,8 @@
 .card {
   overflow: hidden;
   border: 1px solid var(--gn-border);
-  border-radius: 0.8rem;
-  background: white;
+  border-radius: var(--gn-radius);
+  background: var(--gn-surface);
   box-shadow: var(--gn-shadow-sm);
   transition: box-shadow 0.2s;
 
@@ -150,11 +125,7 @@
 
   img,
   .placeholder {
-    display: block;
-    width: 100%;
-    aspect-ratio: 3 / 4;
-    object-fit: cover;
-    background: var(--gn-border);
+    @include cover-image;
   }
 
   .placeholder {
@@ -220,8 +191,8 @@
   display: block;
   width: 100%;
   margin-top: 0.85rem;
-  border: 1px solid #fca5a5;
-  border-radius: 0.5rem;
+  border: 1px solid var(--gn-danger-border);
+  border-radius: var(--gn-radius-sm);
   padding: 0.5rem 0.75rem;
   background: transparent;
   color: var(--gn-danger);
@@ -243,106 +214,21 @@
 
 
 // --- Modal de détail -------------------------------------------------------------
-// Élément <dialog> natif : le fond sombre est fourni par ::backdrop, plus besoin d'une
-// div englobante. La modal est une colonne flex dont seul le corps défile, ce qui évite
-// la barre de défilement qui traversait auparavant toute la boîte et écrasait les
-// coins arrondis.
+// Toute la mécanique du <dialog> natif (positionnement, fond, corps défilant, pièges
+// évités) vit dans le partiel partagé : cette page ne décrit que son contenu.
 
 .modal {
-  display: none;
-
-  // Surtout pas de `position` ici : la feuille de style du navigateur pose déjà
-  // `position: fixed` sur `dialog:modal`, et l'écraser (même par `relative`) replace la
-  // modal dans le flux du document — elle défile alors avec la page et sort de l'écran.
-  // `fixed` sert aussi de référence au bouton de fermeture en `position: absolute`.
-  // `inset: 0` + `margin: auto` centre exactement dans les deux axes, sans dépendre des
-  // marges par défaut que le navigateur applique à <dialog> (qui décalaient la boîte
-  // d'une quinzaine de pixels vers le bas).
-  inset: 0;
-  margin: auto;
-  width: min(100% - 3rem, 870px);
-  max-width: none;
-  max-height: min(95vh, 780px);
-  padding: 0;
-  border: 0;
-  border-radius: 16px;
-  background: white;
-  color: inherit;
-  box-shadow: var(--gn-shadow-xl);
-  overflow: hidden;
-
-  &[open] {
-    display: flex;
-    flex-direction: column;
-    animation: modal-in 0.18s ease-out;
-  }
-
-  &::backdrop {
-    background: var(--gn-backdrop);
-  }
-
-  &[open]::backdrop {
-    animation: backdrop-in 0.18s ease-out;
-  }
+  @include dialog-modal(870px);
 }
 
-@keyframes modal-in {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.98);
-  }
-}
-
-@keyframes backdrop-in {
-  from {
-    opacity: 0;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .modal[open],
-  .modal[open]::backdrop {
-    animation: none;
-  }
-}
+@include dialog-keyframes;
 
 .modal-close {
-  position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  display: grid;
-  place-items: center;
-  width: 2.2rem;
-  height: 2.2rem;
-  padding: 0;
-  margin: 0;
-  border: 0;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--gn-ink) 80%, transparent);
-  color: white;
-  cursor: pointer;
-  font-size: 1.3rem;
-  line-height: 1;
-  z-index: 2;
-  backdrop-filter: blur(4px);
-  transition: background 0.15s;
-
-  &:hover {
-    background: var(--gn-ink);
-  }
+  @include dialog-close;
 }
 
 .modal-body {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  padding: 1.25rem;
-  overflow-y: auto;
-
-  // Arrivé en bout de course, le défilement ne se propage plus à la page derrière.
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-  scrollbar-color: var(--gn-border-strong) transparent;
+  @include dialog-body;
 
   // 700px et non 580 : en dessous, la jaquette (240px) et les gouttières ne laissaient
   // qu'une colonne de texte d'environ 240px, où le synopsis se hachait en lignes de
@@ -410,10 +296,6 @@
   p {
     line-height: 1.55;
   }
-
-  .remove {
-    margin-top: 1.25rem;
-  }
 }
 
 // Les deux dates se ressemblaient trop pour être empilées : sur une seule ligne, en
@@ -460,18 +342,9 @@
 }
 
 .tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin: 1rem 0 0;
+  @include tag-list;
 
-  span {
-    padding: 0.25rem 0.6rem;
-    border-radius: 99px;
-    background: var(--gn-primary-soft);
-    color: var(--gn-primary-deep);
-    font-size: 0.82rem;
-  }
+  margin: 1rem 0 0;
 }
 
 .note-section {
@@ -488,8 +361,31 @@
 }
 
 .note-label {
+  @include field-label;
+
   margin: 0 0 0.6rem;
-  color: var(--gn-text-soft);
-  font-size: 0.9rem;
-  font-weight: 600;
 }
+
+/*
+ * Bas de modal : l'action utile (aller lire les avis) et l'action destructrice (retirer
+ * de la collection) sont separees visuellement, la seconde restant en retrait pour ne pas
+ * etre cliquee par reflexe.
+ */
+.modal-actions {
+  @include modal-actions;
+}
+
+.see-reviews {
+  @include button-primary;
+
+  ng-icon {
+    font-size: 1.15rem;
+  }
+}
+
+.modal-actions .remove {
+  display: inline-flex;
+  width: auto;
+  margin: 0 0 0 auto;
+}
+

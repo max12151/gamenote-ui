@@ -11,7 +11,11 @@ import {
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
-import { phosphorImageDuotone, phosphorXDuotone } from '@ng-icons/phosphor-icons/duotone';
+import {
+  phosphorChatsCircleDuotone,
+  phosphorImageDuotone,
+  phosphorXDuotone
+} from '@ng-icons/phosphor-icons/duotone';
 import { phosphorXBold } from '@ng-icons/phosphor-icons/bold';
 import { finalize } from 'rxjs';
 import { GameRating } from '../../../../core/models/game-rating.model';
@@ -29,7 +33,7 @@ type SortDir = 'asc' | 'desc';
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './collection-page.component.html',
   styleUrl: './collection-page.component.scss',
-  providers: [provideIcons({ phosphorImageDuotone, phosphorXDuotone, phosphorXBold })]
+  providers: [provideIcons({ phosphorImageDuotone, phosphorXDuotone, phosphorXBold, phosphorChatsCircleDuotone })]
 })
 export class CollectionPageComponent {
   private readonly ratingService = inject(RatingService);

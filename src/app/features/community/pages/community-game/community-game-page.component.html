@@ -63,6 +63,12 @@
       </div>
     </article>
 
+    @if (detail.ratingCount === 0) {
+      <p class="state empty">
+        Personne n'a encore noté ce jeu sur GameNote. Mets-lui une note ci-dessous pour
+        ouvrir le bal.
+      </p>
+    } @else {
     <section
       class="scoreboard"
       aria-label="Notes de la communauté"
@@ -99,6 +105,7 @@
         }
       </ul>
     </section>
+    }
 
     <section
       class="my-rating"
@@ -210,18 +217,15 @@
           @for (comment of detail.comments; track comment.id) {
             <li [class.own]="comment.mine">
               <div class="comment-head">
-                <app-user-avatar
+                <app-author-link
                   [userId]="comment.authorId"
                   [username]="comment.authorUsername"
                   [hasAvatar]="comment.authorHasAvatar"
                 />
 
-                <span class="author">
-                  {{ comment.authorUsername }}
-                  @if (comment.mine) {
-                    <span class="badge">toi</span>
-                  }
-                </span>
+                @if (comment.mine) {
+                  <span class="badge">toi</span>
+                }
 
                 @if (comment.authorRating !== null) {
                   <span

@@ -6,8 +6,10 @@ import { Router, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import {
   phosphorCalendarBlankDuotone,
+  phosphorChatsCircleDuotone,
   phosphorFireDuotone,
   phosphorImageDuotone,
+  phosphorLockKeyDuotone,
   phosphorMagnifyingGlassDuotone,
   phosphorTrophyDuotone
 } from '@ng-icons/phosphor-icons/duotone';
@@ -16,20 +18,26 @@ import { HomeService } from '../../data-access/home.service';
 import { IgdbApiService } from '../../../igdb/data-access/igdb-api.service';
 import { IgdbGame } from '../../../igdb/models/igdb-game.model';
 import { CommunityService } from '../../../community/data-access/community.service';
-import { CommunityGame } from '../../../community/models/community.model';
+import { CommunityGame, RecentComment } from '../../../community/models/community.model';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { RatingService } from '../../../../core/rating/rating.service';
+import { AuthorLinkComponent } from '../../../../shared/author/author-link.component';
 import { NotePickerComponent } from '../../../../shared/rating/note-picker.component';
 import { ratingColor } from '../../../../shared/rating/rating-color';
 
 const TOP_GAMES = 6;
-const UPCOMING_GAMES = 8;
+// Le serveur garde un vivier plus large en cache : passer de 8 à 16 cartes ne déclenche
+// aucun appel IGDB supplémentaire, l'ordre par attente est celui rendu par l'API.
+const UPCOMING_GAMES = 15;
+// Assez pour donner le ton du site sans que la page d'accueil devienne un fil d'avis :
+// le classement et les sorties doivent rester visibles sans faire défiler longtemps.
+const RECENT_REVIEWS = 6;
 const MIN_QUERY_LENGTH = 2;
 
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [DatePipe, ReactiveFormsModule, RouterLink, NgIcon, NotePickerComponent],
+  imports: [DatePipe, ReactiveFormsModule, RouterLink, NgIcon, NotePickerComponent, AuthorLinkComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss',
@@ -38,7 +46,9 @@ const MIN_QUERY_LENGTH = 2;
       phosphorMagnifyingGlassDuotone,
       phosphorTrophyDuotone,
       phosphorCalendarBlankDuotone,
+      phosphorChatsCircleDuotone,
       phosphorFireDuotone,
+      phosphorLockKeyDuotone,
       phosphorImageDuotone
     })
   ]
@@ -65,6 +75,9 @@ export class HomePageComponent {
   readonly upcoming = signal<IgdbGame[]>([]);
   readonly upcomingLoading = signal(true);
   readonly upcomingError = signal('');
+
+  readonly reviews = signal<RecentComment[]>([]);
+  readonly reviewsLoading = signal(false);
 
   /** Notes déjà attribuées, pour préremplir les sélecteurs des résultats de recherche. */
   readonly myRatings = signal<Map<number, number>>(new Map());
@@ -93,10 +106,20 @@ export class HomePageComponent {
       error: () => this.upcomingError.set('Les sorties à venir sont indisponibles pour le moment.')
     });
 
+    // Deux appels réservés aux membres. Les lancer déconnecté ne donnerait que des 401
+    // dans la console pour deux blocs qui, de toute façon, ne s'affichent pas.
     if (this.auth.isAuthenticated()) {
       this.ratingService.getCollection().subscribe({
         next: collection => this.myRatings.set(new Map(collection.map(r => [r.igdbGameId, r.rating]))),
         error: () => {}
+      });
+
+      this.reviewsLoading.set(true);
+      this.homeService.getRecentComments(RECENT_REVIEWS).pipe(
+        finalize(() => this.reviewsLoading.set(false))
+      ).subscribe({
+        next: comments => this.reviews.set(comments),
+        error: () => this.reviews.set([])
       });
     }
 

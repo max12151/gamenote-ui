@@ -27,17 +27,19 @@
 
   @if (ratings().length > 0) {
     <div class="toolbar">
-      <label>
-        Trier par
-        <select
-          [value]="sortKey()"
-          (change)="setSortKey($any($event.target).value)"
-        >
-          <option value="added">Date d'ajout</option>
-          <option value="rating">Note</option>
-          <option value="releaseDate">Date de sortie</option>
-          <option value="title">Titre</option>
-        </select>
+      <label class="field">
+        <span class="field-name">Trier par</span>
+        <span class="select">
+          <select
+            [value]="sortKey()"
+            (change)="setSortKey($any($event.target).value)"
+          >
+            <option value="added">Date d'ajout</option>
+            <option value="rating">Note</option>
+            <option value="releaseDate">Date de sortie</option>
+            <option value="title">Titre</option>
+          </select>
+        </span>
       </label>
 
       <button
@@ -50,17 +52,19 @@
       </button>
 
       @if (availableGenres().length > 0) {
-        <label>
-          Genre
-          <select
-            [value]="genreFilter()"
-            (change)="setGenreFilter($any($event.target).value)"
-          >
-            <option value="">Tous</option>
-            @for (genre of availableGenres(); track genre) {
-              <option [value]="genre">{{ genre }}</option>
-            }
-          </select>
+        <label class="field">
+          <span class="field-name">Genre</span>
+          <span class="select">
+            <select
+              [value]="genreFilter()"
+              (change)="setGenreFilter($any($event.target).value)"
+            >
+              <option value="">Tous</option>
+              @for (genre of availableGenres(); track genre) {
+                <option [value]="genre">{{ genre }}</option>
+              }
+            </select>
+          </span>
         </label>
       }
 
@@ -218,14 +222,24 @@
           />
         </div>
 
-        <button
-          type="button"
-          class="remove"
-          [disabled]="removingId() === item.igdbGameId"
-          (click)="remove(item)"
-        >
-          {{ removingId() === item.igdbGameId ? 'Retrait…' : 'Retirer de la collection' }}
-        </button>
+        <div class="modal-actions">
+          <a
+            class="see-reviews"
+            [routerLink]="['/avis', item.igdbGameId]"
+          >
+            <ng-icon name="phosphorChatsCircleDuotone" />
+            Voir les avis des joueurs
+          </a>
+
+          <button
+            type="button"
+            class="remove"
+            [disabled]="removingId() === item.igdbGameId"
+            (click)="remove(item)"
+          >
+            {{ removingId() === item.igdbGameId ? 'Retrait…' : 'Retirer de la collection' }}
+          </button>
+        </div>
       </div>
     </div>
   }

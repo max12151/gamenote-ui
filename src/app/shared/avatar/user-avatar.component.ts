@@ -59,11 +59,22 @@ export class UserAvatarComponent {
   /** Le serveur indique s'il y a une image, ce qui évite une requête vouée au 404. */
   readonly hasAvatar = input(false);
 
+  /**
+   * Image déjà en main, à afficher telle quelle plutôt que d'aller la chercher.
+   *
+   * Seul le propriétaire d'un compte reçoit sa photo dans la réponse, et seule sa page de
+   * profil s'en sert : y passer par la route dédiée ferait revenir l'ancienne image juste
+   * après un changement, le navigateur ayant reçu l'ordre de la garder une heure.
+   */
+  readonly imageUrl = input<string | null>(null);
+
   /** Une image supprimée entre-temps ne doit pas laisser une pastille vide. */
   private readonly loadFailed = signal(false);
 
-  readonly showImage = computed(() => this.hasAvatar() && !this.loadFailed());
-  readonly src = computed(() => `${environment.apiUrl}/api/users/${this.userId()}/avatar`);
+  readonly showImage = computed(() => Boolean(this.imageUrl() || this.hasAvatar()) && !this.loadFailed());
+
+  readonly src = computed(() =>
+    this.imageUrl() || `${environment.apiUrl}/api/users/${this.userId()}/avatar`);
 
   readonly initials = computed(() => {
     const name = this.username().trim();

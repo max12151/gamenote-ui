@@ -4,6 +4,7 @@ import { Observable, tap } from 'rxjs';
 import { environment } from '../../../../environments/environments';
 import { AuthService } from '../../../core/auth/auth.service';
 import { User } from '../../../core/models/user.model';
+import { PublicProfile } from '../models/public-profile.model';
 import { UpdateProfileRequest } from '../models/update-profile-request.model';
 
 @Injectable({ providedIn: 'root' })
@@ -22,5 +23,13 @@ export class ProfileService {
     return this.http.put<User>(this.endpoint, request).pipe(
       tap(user => this.auth.updateStoredUser(user))
     );
+  }
+
+  /**
+   * Profil d'un autre joueur. Réponse volontairement plus pauvre que `/me` : ni adresse
+   * e-mail, ni avatar en base64 — juste de quoi savoir qui a écrit ce qu'on vient de lire.
+   */
+  getPublicProfile(userId: number): Observable<PublicProfile> {
+    return this.http.get<PublicProfile>(`${environment.apiUrl}/api/users/${userId}/profile`);
   }
 }

@@ -43,7 +43,7 @@
 <div class="page">
   @if (hasQuery()) {
     <section
-      class="block"
+      class="block search-results"
       aria-label="Résultats de recherche"
     >
       <header class="block-head">
@@ -107,7 +107,7 @@
   }
 
   <section
-    class="block"
+    class="block ranking"
     aria-label="Les mieux notés du site"
   >
     <header class="block-head">
@@ -170,7 +170,92 @@
   </section>
 
   <section
-    class="block"
+    class="block reviews"
+    aria-label="Derniers avis des joueurs"
+  >
+    <header class="block-head">
+      <h2>
+        <ng-icon name="phosphorChatsCircleDuotone" />
+        Ce que disent les joueurs
+      </h2>
+      <a
+        class="more"
+        routerLink="/avis"
+      >
+        Voir tous les avis
+      </a>
+    </header>
+
+    @if (!auth.isAuthenticated()) {
+      <p class="state locked">
+        <ng-icon name="phosphorLockKeyDuotone" />
+        Les avis sont réservés aux membres.
+        <a routerLink="/login">Connecte-toi</a>
+        pour lire ce que les autres joueurs pensent de leurs jeux.
+      </p>
+    } @else if (reviewsLoading()) {
+      <p class="state">Chargement des derniers avis…</p>
+    } @else if (reviews().length === 0) {
+      <p class="state">Personne n'a encore laissé d'avis. À toi d'ouvrir le bal !</p>
+    } @else {
+      <ul class="review-list">
+        @for (review of reviews(); track review.id) {
+          <li class="review">
+            <div class="review-head">
+              <app-author-link
+                [userId]="review.authorId"
+                [username]="review.authorUsername"
+                [hasAvatar]="review.authorHasAvatar"
+              />
+
+              @if (review.authorRating !== null) {
+                <span
+                  class="note"
+                  [style.color]="ratingColor(review.authorRating)"
+                >
+                  {{ review.authorRating }}<small>/10</small>
+                </span>
+              }
+
+              <time
+                class="date"
+                [attr.datetime]="review.createdAt"
+              >
+                {{ review.createdAt | date: 'shortDate' }}
+              </time>
+            </div>
+
+            <p class="review-body">{{ review.content }}</p>
+
+            <a
+              class="review-game"
+              [routerLink]="['/avis', review.igdbGameId]"
+            >
+              @if (review.gameCoverUrl) {
+                <img
+                  [src]="review.gameCoverUrl"
+                  [alt]="'Jaquette de '"
+                  loading="lazy"
+                />
+              } @else {
+                <span class="cover placeholder">
+                  <ng-icon
+                    name="phosphorImageDuotone"
+                    size="1.1rem"
+                  />
+                </span>
+              }
+
+              <span class="game-title">{{ review.gameTitle }}</span>
+            </a>
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <section
+    class="block releases"
     aria-label="Sorties à venir"
   >
     <header class="block-head">
@@ -194,7 +279,7 @@
               <img
                 class="cover"
                 [src]="game.coverUrl"
-                [alt]="'Jaquette de ' + game.title"
+                [alt]="game.title"
                 loading="lazy"
               />
             } @else {

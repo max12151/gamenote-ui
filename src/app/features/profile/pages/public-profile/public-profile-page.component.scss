@@ -1,0 +1,349 @@
+@use 'shared' as *;
+
+:host {
+  @include page-host;
+}
+
+.page {
+  @include page-shell(820px);
+
+  padding-top: 1.5rem;
+}
+
+.back {
+  @include text-link;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.9rem;
+}
+
+.state {
+  @include state-message;
+
+  padding: 2.5rem;
+}
+
+/* --- Identité -------------------------------------------------------------------- */
+
+.identity {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.5rem;
+  border: 1px solid var(--gn-border);
+  border-radius: var(--gn-radius-lg);
+  box-shadow: var(--gn-shadow);
+
+  // Le violet est la couleur de l'identité sur ce site : c'est déjà celle de la pastille
+  // d'avatar quand elle n'a que des initiales à montrer.
+  background:
+    radial-gradient(30rem 12rem at 0 0, var(--gn-primary-tint), transparent 70%),
+    var(--gn-surface);
+}
+
+.portrait {
+  --avatar-size: 5rem;
+
+  box-shadow: var(--gn-shadow-sm);
+}
+
+.identity-body {
+  flex: 1;
+  min-width: 0;
+
+  h1 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0;
+    color: var(--gn-ink);
+    font-size: 1.6rem;
+  }
+}
+
+.badge {
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--gn-radius-pill);
+  background: var(--gn-primary-soft);
+  color: var(--gn-primary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.since {
+  margin: 0.3rem 0 0;
+  color: var(--gn-muted);
+  font-size: 0.88rem;
+}
+
+.bio {
+  margin: 0.7rem 0 0;
+  color: var(--gn-text);
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.own {
+  @include text-link;
+
+  display: inline-block;
+  margin-top: 0.7rem;
+  font-size: 0.85rem;
+}
+
+/* --- Chiffres clés --------------------------------------------------------------- */
+
+/*
+ * Trois vignettes, trois teintes : jamais deux fois la même couleur côte à côte, pour que
+ * l'œil sépare les chiffres sans avoir à lire les libellés. La couleur n'est portée que
+ * par l'icône et le liseré — le chiffre, lui, reste noir, sauf la moyenne dont la teinte
+ * dit déjà quelque chose (elle suit l'échelle de notes du site).
+ */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: 0.9rem;
+  margin-top: 1.25rem;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--gn-border);
+  border-left: 3px solid var(--stat-accent);
+  border-radius: var(--gn-radius);
+  background: var(--gn-surface);
+  box-shadow: var(--gn-shadow-sm);
+
+  ng-icon {
+    margin-bottom: 0.2rem;
+    color: var(--stat-accent);
+    font-size: 1.4rem;
+  }
+
+  &.games {
+    --stat-accent: var(--gn-primary);
+  }
+
+  &.average {
+    --stat-accent: var(--gn-teal);
+  }
+
+  &.genre {
+    --stat-accent: var(--gn-amber);
+  }
+}
+
+.value {
+  color: var(--gn-ink);
+  font-size: 1.75rem;
+  font-weight: 800;
+  line-height: 1.1;
+
+  // Un nom de genre n'est pas un nombre : à la même taille il déborderait de la vignette.
+  &.small {
+    font-size: 1.1rem;
+    overflow-wrap: anywhere;
+  }
+}
+
+.label {
+  color: var(--gn-muted);
+  font-size: 0.82rem;
+}
+
+/* --- Coup de cœur et genres ------------------------------------------------------ */
+
+h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1.75rem 0 0.9rem;
+  color: var(--gn-ink);
+  font-size: 1.15rem;
+
+  ng-icon {
+    color: var(--gn-teal);
+    font-size: 1.35rem;
+  }
+}
+
+.favourite-card {
+  display: grid;
+  grid-template-columns: 3.25rem 1fr auto;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.7rem 1rem 0.7rem 0.7rem;
+  border: 1px solid var(--gn-amber-soft);
+  border-radius: var(--gn-radius);
+  background: linear-gradient(100deg, var(--gn-amber-tint), var(--gn-surface) 60%);
+  box-shadow: var(--gn-shadow-sm);
+  color: inherit;
+
+  // Carte-lien : le soulignement du navigateur barrerait le titre et la note.
+  text-decoration: none;
+  transition: box-shadow 0.2s, border-color 0.2s, transform 0.15s;
+
+  &:hover {
+    border-color: var(--gn-amber);
+    box-shadow: var(--gn-shadow-lg);
+    transform: translateY(-1px);
+  }
+
+  img,
+  .cover {
+    @include thumb-cover(3.25rem, var(--gn-radius-sm));
+  }
+
+  .cover.placeholder {
+    @include cover-placeholder;
+  }
+}
+
+.favourite-body {
+  @include card-lines;
+}
+
+.game-title {
+  overflow: hidden;
+  color: var(--gn-ink);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.muted {
+  color: var(--gn-muted);
+  font-size: 0.82rem;
+}
+
+.note {
+  font-size: 1.15rem;
+  font-weight: 800;
+  white-space: nowrap;
+
+  small {
+    font-size: 0.7rem;
+    font-weight: 600;
+    opacity: 0.6;
+  }
+}
+
+.genre-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: grid;
+    grid-template-columns: 9rem 1fr 2rem;
+    align-items: center;
+    gap: 0.75rem;
+  }
+}
+
+.genre-name {
+  overflow: hidden;
+  color: var(--gn-text-soft);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.genre-track {
+  @include meter-track;
+}
+
+.genre-bar {
+  @include meter-fill;
+
+  background: linear-gradient(90deg, var(--gn-primary), var(--gn-teal));
+}
+
+.genre-count {
+  color: var(--gn-subtle);
+  font-size: 0.8rem;
+  text-align: right;
+}
+
+/* --- Ses derniers avis ----------------------------------------------------------- */
+
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.review {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--gn-border);
+  border-radius: var(--gn-radius);
+  background: var(--gn-surface);
+  box-shadow: var(--gn-shadow-sm);
+}
+
+.review-game {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+  color: var(--gn-text-soft);
+  text-decoration: none;
+
+  &:hover .game-title {
+    color: var(--gn-teal);
+  }
+
+  img,
+  .cover {
+    @include thumb-cover;
+  }
+
+  .cover.placeholder {
+    @include cover-placeholder;
+  }
+
+  .note {
+    margin-left: auto;
+    font-size: 0.92rem;
+  }
+
+  .game-title {
+    transition: color 0.15s;
+  }
+}
+
+.review-body {
+  @include comment-text;
+}
+
+.date {
+  display: block;
+  margin-top: 0.5rem;
+  color: var(--gn-subtle);
+  font-size: 0.78rem;
+}
+
+@media (max-width: 520px) {
+  .genre-list li {
+    grid-template-columns: 6.5rem 1fr 1.75rem;
+    gap: 0.5rem;
+  }
+}

@@ -12,10 +12,38 @@
   --gn-primary-soft: #ede9fe;
   --gn-primary-tint: #f5f3ff;
 
+  /*
+   * Teintes secondaires.
+   *
+   * Le violet reste la marque et signale ce sur quoi on agit : boutons, liens, page
+   * courante. Tout repeindre en violet finissait par ne plus rien distinguer — ces deux
+   * teintes portent chacune un sens, et ne servent qu'à ça :
+   *   - sarcelle : ce que disent les autres joueurs (avis, commentaires, communauté) ;
+   *   - ambre    : ce qui n'est pas encore là (sorties à venir, attente, compteurs).
+   *
+   * Les valeurs de texte sont prises assez sombres pour rester lisibles sur blanc
+   * (rapport de contraste supérieur à 4,5:1) ; les variantes « soft » sont des fonds de
+   * pastille, les « tint » des lavis de section.
+   */
+  --gn-teal: #0f766e;
+  --gn-teal-soft: #ccfbf1;
+  --gn-teal-tint: #f0fdfa;
+
+  --gn-amber: #b45309;
+  /* Assez sombre pour porter du texte blanc lisible : la pastille d'attente, posée sur
+     une jaquette, doit rester déchiffrable quelle que soit l'image dessous. */
+  --gn-amber-deep: #92400e;
+  --gn-amber-soft: #fef3c7;
+  --gn-amber-tint: #fffbeb;
+
   /* Fonds et surfaces */
   --gn-bg: #f8fafc;
   --gn-surface: #ffffff;
   --gn-surface-alt: #f1f5f9;
+
+  /* Texte pose sur un aplat colore (bouton violet, pastille sombre). Jeton distinct
+     de --gn-surface : celui-ci designe un fond, pas une couleur d'encre. */
+  --gn-on-primary: #ffffff;
 
   /* Traits */
   --gn-border: #e2e8f0;
@@ -28,8 +56,18 @@
   --gn-muted: #64748b;
   --gn-subtle: #94a3b8;
 
+  /* Médailles du podium. Valeurs propres : l'argent tombe par hasard sur la même teinte
+     que --gn-subtle, mais une médaille n'est pas du texte discret et les deux doivent
+     pouvoir évoluer séparément. */
+  --gn-medal-gold: #d4a017;
+  --gn-medal-silver: #94a3b8;
+  --gn-medal-bronze: #b06a34;
+
   /* États */
   --gn-danger: #b91c1c;
+  /* Liseré des actions destructrices : le rouge plein en contour serait une alarme, alors
+     que retirer un jeu de sa collection est un geste ordinaire, juste irréversible. */
+  --gn-danger-border: #fca5a5;
   --gn-danger-soft: #fef2f2;
   --gn-success: #15803d;
 

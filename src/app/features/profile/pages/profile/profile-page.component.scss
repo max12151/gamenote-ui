@@ -1,41 +1,48 @@
+@use 'shared' as *;
+
 :host {
-  display: block;
-  min-height: calc(100vh - 4rem);
-  background: var(--gn-bg);
+  @include page-host;
 }
 
 .page {
-  width: 100%;
-  max-width: 750px;
-  margin: 0 auto;
-  padding: 2rem 1rem 4rem;
-  box-sizing: border-box;
+  @include page-shell(750px);
 }
 
 .state {
-  padding: 3rem;
-  text-align: center;
-  color: var(--gn-muted);
-  max-height: 0px;
+  @include state-message;
 }
 
-.error {
-  color: var(--gn-danger);
-}
+/*
+ * Deux usages, deux formes. Pleine page, le message remplace le contenu et mérite ses
+ * 3rem ; posé dans la carte, il s'intercale entre deux blocs et doit rester compact.
+ *
+ * Un `max-height: 0` traînait sur la règle commune pour rattraper le second cas : la
+ * boîte n'avait plus de hauteur, mais son texte, lui, continuait de s'afficher par-dessus
+ * le bloc suivant. La distinction se fait maintenant par le contexte.
+ */
+.card .state {
+  margin: 0 0 1.25rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--gn-radius-sm);
+  text-align: left;
+  font-size: 0.9rem;
 
-.success {
-  color: var(--gn-success);
+  &.error {
+    background: var(--gn-danger-soft);
+  }
+
+  &.success {
+    color: var(--gn-success);
+    background: color-mix(in srgb, var(--gn-success) 10%, transparent);
+  }
 }
 
 .card {
-  padding: 1.75rem;
-  border: 1px solid var(--gn-border);
-  border-radius: 0.8rem;
-  background: white;
-  box-shadow: var(--gn-shadow-sm);
-  box-sizing: border-box;
-  width: 100%;
+  @include surface-card($hover: false);
 
+  width: 100%;
+  padding: 1.75rem;
+  box-sizing: border-box;
 }
 
 .header {
@@ -43,24 +50,6 @@
   align-items: center;
   gap: 1rem;
   margin-bottom: 1.5rem;
-
-  img,
-  .placeholder {
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
-  }
-
-  .placeholder {
-    display: grid;
-    place-items: center;
-    background: var(--gn-primary-soft);
-    color: var(--gn-primary-deep);
-    font-size: 1.6rem;
-    font-weight: 700;
-  }
 
   .identity {
     flex: 1;
@@ -72,6 +61,18 @@
       font-size: 1.4rem;
     }
   }
+}
+
+.portrait {
+  --avatar-size: 72px;
+}
+
+.public-link {
+  @include text-link;
+
+  display: inline-block;
+  margin-top: 0.45rem;
+  font-size: 0.82rem;
 }
 
 .muted {
@@ -117,17 +118,33 @@
   margin-bottom: 1.25rem;
 }
 
+/*
+ * Quatre vignettes du même violet se lisaient comme un seul bloc. Chacune prend la teinte
+ * de ce qu'elle raconte — l'ordre du gabarit étant fixe, `nth-child` suffit et évite
+ * d'ajouter une classe par vignette dans le template.
+ */
 .stat-tile {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
   padding: 0.9rem;
   border-radius: 0.6rem;
-  background: var(--gn-primary-tint);
+  border-left: 3px solid var(--tile-accent, var(--gn-primary));
+  background: var(--tile-tint, var(--gn-primary-tint));
+
+  &:nth-child(2) {
+    --tile-accent: var(--gn-teal);
+    --tile-tint: var(--gn-teal-tint);
+  }
+
+  &:nth-child(3) {
+    --tile-accent: var(--gn-amber);
+    --tile-tint: var(--gn-amber-tint);
+  }
 }
 
 .stat-value {
-  color: var(--gn-primary-deep);
+  color: var(--tile-accent, var(--gn-primary-deep));
   font-weight: 700;
   font-size: 1.15rem;
   overflow-wrap: break-word;
@@ -181,16 +198,15 @@
 }
 
 .genre-bar {
-  height: 0.5rem;
-  border-radius: 99px;
-  background: var(--gn-primary-soft);
-  overflow: hidden;
+  @include meter-track(0.5rem, var(--gn-primary-soft));
 }
 
 .genre-bar-fill {
-  height: 100%;
-  border-radius: 99px;
-  background: var(--gn-primary);
+  @include meter-fill;
+
+  // Dégradé plutôt qu'un aplat : les barres longues gagnent une profondeur que le violet
+  // seul n'a pas, et le sarcelle de fin les rattache au reste de la page.
+  background: linear-gradient(90deg, var(--gn-primary), var(--gn-teal));
 }
 
 .genre-count {
@@ -220,21 +236,10 @@
 
   input,
   textarea {
-    margin-bottom: 1.1rem;
-    padding: 0.75rem 0.9rem;
-    border: 1px solid var(--gn-border-strong);
-    border-radius: 0.6rem;
-    background: white;
-    color: var(--gn-ink);
-    font: inherit;
-    outline: none;
-    resize: vertical;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    @include text-field;
 
-    &:focus {
-      border-color: var(--gn-primary);
-      box-shadow: var(--gn-focus-ring);
-    }
+    margin-bottom: 1.1rem;
+    resize: vertical;
   }
 }
 
@@ -244,34 +249,17 @@
 }
 
 button {
-  border: 0;
-  border-radius: 0.6rem;
+  @include button-primary;
+
   padding: 0.7rem 1.1rem;
-  background: var(--gn-primary);
-  color: white;
-  cursor: pointer;
-  font: inherit;
-  font-weight: 600;
-  transition: background 0.2s, opacity 0.2s;
-
-  &:hover:not(:disabled) {
-    background: var(--gn-primary-deep);
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
+  font-size: 1rem;
 }
 
 .ghost {
-  background: transparent;
-  color: var(--gn-text-soft);
-  border: 1px solid var(--gn-border-strong);
+  @include button-ghost;
 
-  &:hover:not(:disabled) {
-    background: var(--gn-surface-alt);
-  }
+  padding: 0.7rem 1.1rem;
+  font-size: 1rem;
 }
 
 /* --- Graphiques ------------------------------------------------------------------ */
@@ -363,7 +351,7 @@ button {
   color: var(--gn-muted);
 
   &.strict {
-    color: #b45309;
+    color: var(--gn-amber);
   }
 
   &.generous {
@@ -383,20 +371,22 @@ button {
 }
 
 .split {
+  @include meter-track(0.7rem);
+
   display: flex;
-  height: 0.7rem;
-  overflow: hidden;
-  border-radius: var(--gn-radius-pill);
-  background: var(--gn-surface-alt);
 }
 
+/*
+ * Trois segments accolés : le rail arrondit l'ensemble, donc chaque segment reste carré —
+ * `meter-fill` arrondirait chacun d'eux et creuserait des encoches entre eux.
+ */
 .seg {
   display: block;
   height: 100%;
   transition: width 0.3s;
 
   &.strict {
-    background: #f59e0b;
+    background: var(--gn-amber);
   }
 
   &.aligned {
@@ -404,7 +394,7 @@ button {
   }
 
   &.generous {
-    background: #34d399;
+    background: var(--gn-success);
   }
 }
 
@@ -425,13 +415,15 @@ button {
   }
 }
 
+// Mêmes teintes que les segments : une légende qui ne reprend pas exactement les
+// couleurs qu'elle explique ne sert à rien.
 .dot {
   width: 0.6rem;
   height: 0.6rem;
   border-radius: 50%;
 
   &.strict {
-    background: #f59e0b;
+    background: var(--gn-amber);
   }
 
   &.aligned {
@@ -439,6 +431,6 @@ button {
   }
 
   &.generous {
-    background: #34d399;
+    background: var(--gn-success);
   }
 }

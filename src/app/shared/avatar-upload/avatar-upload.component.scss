@@ -61,7 +61,7 @@
   display: grid;
   place-items: center;
   background: rgb(15 23 42 / 45%);
-  color: white;
+  color: var(--gn-on-primary);
   opacity: 0;
   transition: opacity 0.15s;
 
@@ -86,8 +86,8 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  border: 1px solid #fca5a5;
-  border-radius: 0.5rem;
+  border: 1px solid var(--gn-danger-border);
+  border-radius: var(--gn-radius-sm);
   padding: 0.35rem 0.65rem;
   background: transparent;
   color: var(--gn-danger);
@@ -135,7 +135,7 @@ image-cropper {
   border-radius: 0.6rem;
   padding: 0.6rem 1rem;
   background: var(--gn-primary);
-  color: white;
+  color: var(--gn-on-primary);
   cursor: pointer;
   font: inherit;
   font-weight: 600;

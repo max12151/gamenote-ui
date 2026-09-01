@@ -10,8 +10,17 @@ export class CommunityService {
   private readonly communityEndpoint = `${environment.apiUrl}/api/community`;
   private readonly commentsEndpoint = `${environment.apiUrl}/api/comments`;
 
-  getRanking(page: number, size: number): Observable<CommunityRanking> {
-    const params = new HttpParams().set('page', page).set('size', size);
+  /**
+   * Le filtre part au serveur plutôt que d'être appliqué sur la page déjà chargée : sans
+   * cela, un jeu classé au-delà des vingt premiers resterait introuvable.
+   */
+  getRanking(page: number, size: number, search = ''): Observable<CommunityRanking> {
+    let params = new HttpParams().set('page', page).set('size', size);
+
+    if (search) {
+      params = params.set('search', search);
+    }
+
     return this.http.get<CommunityRanking>(`${this.communityEndpoint}/games`, { params });
   }
 
