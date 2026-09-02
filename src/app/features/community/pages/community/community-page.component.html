@@ -1,11 +1,44 @@
 <div class="page">
+  <button
+    class="method-toggle"
+    type="button"
+    popovertarget="ranking-method"
+    aria-label="Comment ce classement est établi"
+  >
+    ?
+  </button>
+
+  <div
+    id="ranking-method"
+    class="method"
+    popover
+    aria-labelledby="ranking-method-title"
+  >
+    <h2 id="ranking-method-title">
+      <ng-icon name="phosphorScalesDuotone" />
+      Comment ce classement est établi
+    </h2>
+
+    <p>
+      L'ordre repose sur une moyenne <strong>pondérée</strong>, pas sur la note brute :
+      tant qu'un jeu a reçu peu de votes, sa note est tirée vers celle du site. Un 10 mis
+      par un seul joueur pèse donc moins qu'un 8,5 confirmé par vingt.
+    </p>
+
+    @if (globalAverage() > 0) {
+      <p class="method-values">
+        Moyenne du site
+        <strong>{{ globalAverage() | number: '1.1-1' }}</strong>
+        · pleine confiance à partir de
+        <strong>{{ minimumVotes() | number: '1.0-1' }} votes</strong>
+      </p>
+    }
+  </div>
+
   <header class="header">
     <p class="eyebrow">GameNote · Avis des joueurs</p>
     <h1>Le classement de la communauté</h1>
-    <p>
-      La moyenne des notes de tous les joueurs du site, du mieux noté au moins bien noté.
-      Ouvre un jeu pour voir le détail des notes et lire les avis.
-    </p>
+    <p>Les jeux les mieux notés par les joueurs du site.</p>
 
     <div class="search">
       <ng-icon
@@ -70,7 +103,7 @@
 
     <ol
       class="ranking"
-      aria-label="Classement des jeux par note moyenne"
+      aria-label="Classement des jeux par moyenne pondérée"
     >
       @for (game of games(); track game.igdbGameId; let index = $index) {
         <li>
@@ -107,7 +140,17 @@
               <span class="title">{{ game.title }}</span>
 
               <span class="meta">
-                {{ game.ratingCount }} vote{{ game.ratingCount > 1 ? 's' : '' }}
+                <span
+                  class="average"
+                  [style.color]="ratingColor(game.averageRating)"
+                >
+                  <ng-icon name="phosphorStarDuotone" />
+                  {{ game.averageRating | number: '1.1-1' }}
+                </span>
+
+                <span class="votes">
+                  {{ game.ratingCount }} vote{{ game.ratingCount > 1 ? 's' : '' }}
+                </span>
 
                 @if (game.commentCount > 0) {
                   <span class="comments">
@@ -118,12 +161,14 @@
               </span>
             </span>
 
-            <span
-              class="average"
-              [style.color]="ratingColor(game.averageRating)"
-            >
-              {{ formatAverage(game.averageRating) }}
-              <small>/10</small>
+            <span class="score">
+              <span
+                class="score-value"
+                [style.color]="ratingColor(game.weightedRating)"
+              >
+                {{ game.weightedRating | number: '1.1-1' }}
+              </span>
+              <span class="score-label">score</span>
             </span>
           </a>
         </li>

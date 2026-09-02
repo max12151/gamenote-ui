@@ -177,6 +177,17 @@
   font-size: 0.85rem;
 }
 
+/*
+ * Le podium affiche la note réelle des jeux, alors que leur ordre suit une moyenne
+ * pondérée : un 8,7 peut donc s'y trouver sous un 8,0. Une ligne suffit à lever le doute,
+ * là où reprendre toute l'explication du classement encombrerait une page de vitrine.
+ */
+.block-note {
+  margin: -0.6rem 0 1rem;
+  color: var(--gn-muted);
+  font-size: 0.85rem;
+}
+
 .state {
   @include state-message;
 

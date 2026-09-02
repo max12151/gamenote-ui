@@ -78,7 +78,7 @@
           class="value"
           [style.color]="ratingColor(detail.averageRating)"
         >
-          {{ formatAverage(detail.averageRating) }}
+          {{ detail.averageRating | number: '1.1-1' }}
         </span>
         <span class="out-of">/10</span>
         <span class="votes">

@@ -3,7 +3,14 @@ export interface CommunityGame {
   title: string;
   coverUrl: string | null;
   releaseDate: number | null;
+  /** Moyenne brute des notes reçues : la vraie note du jeu, celle qu'on affiche. */
   averageRating: number;
+  /**
+   * Moyenne pondérée qui décide de la place au classement : la moyenne brute ramenée vers
+   * celle du site à proportion du peu de votes reçus. Les deux sont affichées, sans quoi
+   * l'ordre paraîtrait arbitraire.
+   */
+  weightedRating: number;
   ratingCount: number;
   commentCount: number;
 }
@@ -13,6 +20,10 @@ export interface CommunityRanking {
   totalGames: number;
   page: number;
   size: number;
+  /** Moyenne du site : le `C` de la pondération, vers lequel les jeux peu votés sont tirés. */
+  globalAverage: number;
+  /** Nombre de votes à partir duquel une note compte pleinement : le `m` de la pondération. */
+  minimumVotes: number;
 }
 
 export interface CommunityGameInfo {

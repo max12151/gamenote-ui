@@ -123,6 +123,11 @@
       </a>
     </header>
 
+    <p class="block-note">
+      Classement pondéré : une note confirmée par plusieurs joueurs passe devant une note
+      isolée, même plus haute.
+    </p>
+
     @if (topLoading()) {
       <p class="state">Calcul des moyennes…</p>
     } @else if (topGames().length === 0) {
@@ -137,7 +142,7 @@
               @if (game.coverUrl) {
                 <img
                   [src]="game.coverUrl"
-                  [alt]="'Jaquette de ' + game.title"
+                  [alt]="'Cover de '"
                   loading="lazy"
                 />
               } @else {
@@ -160,7 +165,7 @@
                 class="score"
                 [style.color]="ratingColor(game.averageRating)"
               >
-                {{ formatAverage(game.averageRating) }}
+                {{ game.averageRating | number: '1.1-1' }}
               </span>
             </a>
           </li>
@@ -234,7 +239,7 @@
               @if (review.gameCoverUrl) {
                 <img
                   [src]="review.gameCoverUrl"
-                  [alt]="'Jaquette de '"
+                  [alt]="'Cover de '"
                   loading="lazy"
                 />
               } @else {

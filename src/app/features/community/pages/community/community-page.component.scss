@@ -6,6 +6,9 @@
 
 .page {
   @include page-shell(860px);
+
+  // Repère pour le point d'interrogation, calé dans le coin du contenu.
+  position: relative;
 }
 
 .header {
@@ -80,6 +83,161 @@
   }
 }
 
+/* --- Comment le classement est établi --------------------------------------------- */
+
+/*
+ * Un classement pondéré surprend : un jeu à 8,7 peut passer derrière un 8,0. La règle doit
+ * donc rester joignable, mais elle n'a pas à occuper le haut de page devant la liste qu'on
+ * vient voir. Un point d'interrogation dans le coin, et l'explication en bulle.
+ */
+.method-toggle {
+  position: absolute;
+  top: 2rem;
+  right: 1rem;
+
+  // Point d'ancrage de la bulle : elle se placera d'elle-même sous ce bouton, où qu'il
+  // tombe selon la largeur de l'écran.
+  anchor-name: --method-anchor;
+
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border: 1px solid var(--gn-teal-soft);
+  border-radius: var(--gn-radius-pill);
+  background: var(--gn-teal-tint);
+  color: var(--gn-teal);
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1;
+  transition: background 0.15s, border-color 0.15s;
+
+  &:hover {
+    border-color: var(--gn-teal);
+    background: var(--gn-teal-soft);
+  }
+
+  // Tant que la bulle est ouverte, le bouton reste visiblement enfoncé : sans quoi on ne
+  // sait plus d'où elle sort.
+  &:has(+ .method:popover-open) {
+    border-color: var(--gn-teal);
+    background: var(--gn-teal-soft);
+  }
+}
+
+/*
+ * Bulle native (attribut `popover`) : la fermeture au clic à côté, la touche Échap, le
+ * passage au premier plan et le retour du focus sur le bouton sont fournis par le
+ * navigateur. Aucune ligne de TypeScript, et rien à défaire quand on quitte la page.
+ */
+.method {
+  // Ancrage sous le bouton, replié au-dessus ou de l'autre côté s'il manque la place.
+  //
+  // `span-left` et non `span-inline-start` : une zone ne peut pas mêler un mot physique
+  // (`bottom`) et un mot logique, la déclaration entière serait rejetée en silence.
+  position-anchor: --method-anchor;
+  position-area: bottom span-left;
+  position-try-fallbacks: flip-block, flip-inline;
+
+  // La feuille du navigateur pose `inset: 0` sur les bulles, ce qui les étirerait sur
+  // toute la zone d'ancrage ; on rend la place au calcul d'ancrage.
+  inset: auto;
+  justify-self: end;
+
+  // `box-sizing` avant `width` : le site n'a pas de remise à zéro globale, donc une
+  // largeur porte par défaut sur le seul contenu. Sans cette ligne, les 1,15rem de marge
+  // intérieure s'ajoutaient de chaque côté et la bulle dépassait de l'écran en 375px.
+  box-sizing: border-box;
+  width: min(26rem, calc(100vw - 2rem));
+  margin: 0.45rem 0 0;
+  padding: 1rem 1.15rem 1.1rem;
+  border: 1px solid var(--gn-teal-soft);
+  border-radius: var(--gn-radius);
+  background: var(--gn-surface);
+  box-shadow: var(--gn-shadow-lg);
+  color: var(--gn-text);
+  font-size: 0.88rem;
+
+  // La feuille du navigateur donne aux bulles une bordure noire et un padding minuscule.
+  outline: 0;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 0.7rem;
+    color: var(--gn-teal);
+    font-size: 1rem;
+
+    ng-icon {
+      font-size: 1.3rem;
+    }
+  }
+
+  p {
+    margin: 0 0 0.7rem;
+    line-height: 1.55;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  strong {
+    color: var(--gn-teal);
+  }
+
+  // Petite ouverture : la bulle glisse depuis le bouton plutôt que d'apparaître d'un bloc.
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    opacity 0.15s,
+    transform 0.15s,
+    display 0.15s allow-discrete,
+    overlay 0.15s allow-discrete;
+
+  &:popover-open {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  @starting-style {
+    &:popover-open {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+  }
+}
+
+/*
+ * Repli pour les navigateurs sans ancrage CSS : la bulle se pose dans le coin haut-droit
+ * de l'écran, sous la barre de navigation. Moins précis que l'ancrage, mais jamais au
+ * travers du contenu.
+ */
+@supports not (anchor-name: --repli) {
+  .method {
+    position: fixed;
+    inset: 5rem 1rem auto auto;
+    margin: 0;
+  }
+}
+
+.method-values {
+  color: var(--gn-text-soft);
+}
+
+/* La formule elle-même, pour qui veut vérifier plutôt que croire sur parole. */
+.formula code {
+  display: inline-block;
+  padding: 0.35rem 0.6rem;
+  border-radius: var(--gn-radius-sm);
+  background: var(--gn-teal-tint);
+  color: var(--gn-teal);
+  font-size: 0.85rem;
+}
+
 /* --- Classement ------------------------------------------------------------------- */
 
 .total {
@@ -102,10 +260,11 @@
   @include surface-card;
 
   display: grid;
-  grid-template-columns: 2.5rem 3.25rem 1fr auto;
+  // Quatre colonnes : le rang, la jaquette, ce qu'on lit, et le score qui a décidé du rang.
+  grid-template-columns: 2.75rem 4rem 1fr auto;
   align-items: center;
-  gap: 0.9rem;
-  padding: 0.7rem 1rem 0.7rem 0.6rem;
+  gap: 1rem;
+  padding: 0.85rem 1.15rem 0.85rem 0.7rem;
 
   // Toute la carte est un lien : le soulignement par défaut du navigateur barrait le
   // rang, le titre et la moyenne, y compris le gros chiffre de la note. La carte se
@@ -130,11 +289,11 @@
   align-items: center;
   gap: 0.1rem;
   color: var(--gn-subtle);
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 700;
 
   ng-icon {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
   }
 }
 
@@ -150,7 +309,7 @@
 .podium {
   border-color: color-mix(in srgb, var(--medal) 45%, var(--gn-border));
   background:
-    linear-gradient(90deg, color-mix(in srgb, var(--medal) 10%, transparent), transparent 22rem),
+    linear-gradient(90deg, color-mix(in srgb, var(--medal) 25%, transparent), transparent 22rem),
     var(--gn-surface);
 
   .position {
@@ -171,7 +330,7 @@
 }
 
 .cover {
-  @include thumb-cover(3.25rem, 0.35rem);
+  @include thumb-cover(4rem, var(--gn-radius-sm));
 
   display: block;
 
@@ -187,18 +346,40 @@
 .title {
   color: var(--gn-ink);
   transition: color 0.15s;
+  font-size: 1.05rem;
   font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+/*
+ * Sous le titre : la note réelle du jeu, puis ce qui la fonde. Le score pondéré occupe la
+ * colonne de droite — les deux nombres ne doivent jamais se toucher, sous peine d'être lus
+ * comme une seule valeur.
+ */
 .meta {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.3rem 0.75rem;
   color: var(--gn-subtle);
-  font-size: 0.82rem;
+  font-size: 0.85rem;
+}
+
+.average {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 700;
+
+  ng-icon {
+    font-size: 1rem;
+  }
+}
+
+.votes {
+  color: var(--gn-muted);
 }
 
 // Sarcelle : sur tout le site, c'est la couleur de ce que disent les autres joueurs.
@@ -213,16 +394,32 @@
   }
 }
 
-.average {
-  font-size: 1.35rem;
-  font-weight: 700;
-  white-space: nowrap;
+/*
+ * Le nombre qui décide de la place, et qui n'est pas la note du jeu : il est donc étiqueté.
+ * Sans ce libellé, un score de 7,3 face à une moyenne de 8,5 passerait pour une erreur.
+ */
+.score {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.05rem;
+  padding-left: 0.5rem;
+  border-left: 1px solid var(--gn-border);
+}
 
-  small {
-    font-size: 0.75rem;
-    font-weight: 600;
-    opacity: 0.6;
-  }
+.score-value {
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.score-label {
+  color: var(--gn-subtle);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .load-more {
@@ -234,18 +431,34 @@
   font-size: 0.95rem;
 }
 
-@media (max-width: 520px) {
+@media (max-width: 560px) {
   .card {
-    grid-template-columns: 1.75rem 2.75rem 1fr auto;
-    gap: 0.6rem;
+    grid-template-columns: 1.9rem 3rem 1fr auto;
+    gap: 0.7rem;
+    padding: 0.7rem 0.85rem 0.7rem 0.5rem;
   }
 
   .cover {
-    width: 2.75rem;
+    width: 3rem;
   }
 
-  .average {
-    font-size: 1.15rem;
+  .title {
+    font-size: 0.98rem;
+  }
+
+  .score-value {
+    font-size: 1.25rem;
+  }
+
+  // Le libellé du score et la colonne de gauche disparaissent : à cette largeur, chaque
+  // caractère gagné va au titre du jeu.
+  .score {
+    padding-left: 0.35rem;
+    border-left: 0;
+  }
+
+  .score-label {
+    display: none;
   }
 }
 

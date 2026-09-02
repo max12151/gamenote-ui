@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -37,7 +37,7 @@ const MIN_QUERY_LENGTH = 2;
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [DatePipe, ReactiveFormsModule, RouterLink, NgIcon, NotePickerComponent, AuthorLinkComponent],
+  imports: [DecimalPipe, DatePipe, ReactiveFormsModule, RouterLink, NgIcon, NotePickerComponent, AuthorLinkComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss',
@@ -175,9 +175,6 @@ export class HomePageComponent {
     });
   }
 
-  formatAverage(average: number): string {
-    return average.toFixed(1);
-  }
 
   /** « dans 3 mois », « le mois prochain »… plus parlant qu'une date brute pour une sortie. */
   countdown(releaseDate: number | null): string {

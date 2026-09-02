@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -8,7 +9,9 @@ import {
   phosphorChatsCircleDuotone,
   phosphorImageDuotone,
   phosphorMagnifyingGlassDuotone,
-  phosphorMedalDuotone
+  phosphorMedalDuotone,
+  phosphorScalesDuotone,
+  phosphorStarDuotone
 } from '@ng-icons/phosphor-icons/duotone';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 import { CommunityService } from '../../data-access/community.service';
@@ -20,7 +23,7 @@ const PAGE_SIZE = 20;
 @Component({
   selector: 'app-community-page',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, NgIcon],
+  imports: [DecimalPipe, RouterLink, ReactiveFormsModule, NgIcon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './community-page.component.html',
   styleUrl: './community-page.component.scss',
@@ -29,7 +32,9 @@ const PAGE_SIZE = 20;
       phosphorImageDuotone,
       phosphorChatsCircleDuotone,
       phosphorMedalDuotone,
-      phosphorMagnifyingGlassDuotone
+      phosphorMagnifyingGlassDuotone,
+      phosphorScalesDuotone,
+      phosphorStarDuotone
     })
   ]
 })
@@ -42,6 +47,14 @@ export class CommunityPageComponent {
 
   readonly games = signal<CommunityGame[]>([]);
   readonly totalGames = signal(0);
+
+  /**
+   * Constantes de la pondération, telles que le serveur les a calculées sur l'état réel du
+   * site. Affichées au joueur : un classement qui ne dit pas sur quoi il repose se lit
+   * comme un caprice.
+   */
+  readonly globalAverage = signal(0);
+  readonly minimumVotes = signal(0);
   readonly loading = signal(true);
   readonly loadingMore = signal(false);
   readonly error = signal('');
@@ -83,10 +96,7 @@ export class CommunityPageComponent {
     this.search.setValue('');
   }
 
-  /** Une note moyenne se lit mieux avec une décimale qu'avec les seize du double. */
-  formatAverage(average: number): string {
-    return average.toFixed(1);
-  }
+
 
   /** Repart de la première page : le classement filtré n'a rien à voir avec le précédent. */
   private restart(): void {
@@ -114,6 +124,8 @@ export class CommunityPageComponent {
 
         this.nextPage += 1;
         this.totalGames.set(ranking.totalGames);
+        this.globalAverage.set(ranking.globalAverage);
+        this.minimumVotes.set(ranking.minimumVotes);
         this.games.update(list => [...list, ...ranking.games]);
       },
       error: (err: HttpErrorResponse) =>

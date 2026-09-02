@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { DatePipe } from '@angular/common';
+import { DatePipe, DecimalPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { NgIcon, provideIcons } from '@ng-icons/core';
@@ -24,7 +24,7 @@ const MAX_COMMENT_LENGTH = 2000;
 @Component({
   selector: 'app-community-game-page',
   standalone: true,
-  imports: [DatePipe, RouterLink, NgIcon, NotePickerComponent, AuthorLinkComponent],
+  imports: [DecimalPipe, DatePipe, RouterLink, NgIcon, NotePickerComponent, AuthorLinkComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './community-game-page.component.html',
   styleUrl: './community-game-page.component.scss',
@@ -109,9 +109,6 @@ export class CommunityGamePageComponent {
     });
   }
 
-  formatAverage(average: number): string {
-    return average.toFixed(1);
-  }
 
   barWidth(count: number): string {
     const max = this.maxBucketCount();
