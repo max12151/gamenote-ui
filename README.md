@@ -3,6 +3,30 @@
 Front Angular du site de notation de jeux. L'API vit dans un dépôt séparé (`GameNote`) et
 doit tourner pour que l'application serve à quelque chose.
 
+## Démarrer
+
+Le plus simple est de passer par la pile Docker, décrite dans le dépôt de l'API : elle
+lance base, API et interface d'un coup, avec des données de démonstration.
+
+```bash
+cd ../GameNote && docker compose up --build   # site sur http://localhost:8090
+```
+
+Ce dépôt fournit le `Dockerfile` et la configuration nginx (`docker/nginx.conf`) que cette
+pile utilise ; **les deux dépôts doivent être clonés côte à côte**.
+
+Pour développer l'interface avec rechargement à chaud, garder la pile en marche et lancer
+le serveur Angular par-dessus :
+
+```bash
+npm install
+npm start
+```
+
+L'interface de développement est alors sur `http://localhost:4200` et appelle l'API à
+l'adresse fixée dans `src/environments/environments.ts` (`http://localhost:8080` par
+défaut : l'instance lancée depuis l'IDE ; mettre `8081` pour viser celle du conteneur).
+
 ## Prérequis
 
 | | Version |
@@ -16,15 +40,6 @@ API Popover, ancrage CSS (`anchor-name`), et `appearance: base-select` pour les 
 déroulantes. Chrome ou Edge 135+ pour tout voir. Ailleurs, chaque cas dégrade
 proprement (menu système à la place du panneau stylé, bulle posée dans un coin plutôt
 qu'ancrée), mais l'apparence n'est pas identique.
-
-## Lancer
-
-```bash
-npm install
-npm start
-```
-
-L'application est servie sur `http://localhost:4200` et recharge à chaque modification.
 
 > **Après avoir touché à `angular.json`, redémarrez `ng serve`.** Le serveur ne relit pas ce
 > fichier à chaud. Comme il porte `stylePreprocessorOptions.includePaths`, un serveur lancé
@@ -65,6 +80,9 @@ Trois teintes portent chacune un sens :
 ```bash
 npm run build
 ```
+
+C'est aussi ce que fait la première étape du `Dockerfile`, dont l'image finale ne contient
+que le bundle et nginx — ni Node, ni `node_modules`, ni les sources.
 
 La configuration `production` remplace `src/environments/environments.ts` par
 `environment.prod.ts`, dont l'`apiUrl` est **vide** : les appels partent en chemins relatifs
